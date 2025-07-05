@@ -20,7 +20,7 @@ app.use(express.json());
 async function startServer() {
   try {
     await mongoose.connect(
-      "mongodb+srv://kbharat84265:SjgpL1UbSskmfFBO@cluster0.tfyruuc.mongodb.net/test04"
+      ""
     );
     console.log("MongoDB connected");
 
