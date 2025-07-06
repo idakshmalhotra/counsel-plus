@@ -1,12 +1,10 @@
 import React, { useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Login() {
   const usernameref = useRef();
   const passwordref = useRef();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -20,14 +18,14 @@ function Login() {
         password,
       });
 
-      const jwt = response.data.token;
-      localStorage.setItem("token", jwt);
+      const token = response.data.token;
+      localStorage.setItem("token", token);
 
-      // Optional Redux action dispatch
-      // dispatch(loginAction(response.data.user));
+      console.log("Login successful:", response.data);
+      console.log("Redirecting to dashboard...");
 
       alert("Login successful!");
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
       alert("Login failed. Please check your credentials.");
@@ -44,11 +42,9 @@ function Login() {
             <input
               type="text"
               id="username"
-              name="username"
-              autoComplete="username"
-              className="w-full p-2 border border-gray-300 rounded"
               required
               ref={usernameref}
+              className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
           <div className="mb-6">
@@ -56,11 +52,9 @@ function Login() {
             <input
               type="password"
               id="password"
-              name="password"
-              autoComplete="current-password"
-              className="w-full p-2 border border-gray-300 rounded"
               required
               ref={passwordref}
+              className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
           <button
