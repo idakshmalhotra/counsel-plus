@@ -1,265 +1,208 @@
-// Updated MultiStepForm.js
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Formik, Form } from "formik";
+import React, { useState } from "react";
+import { Formik } from "formik";
 import * as Yup from "yup";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { FiAlertCircle } from "react-icons/fi";
+import axios from "axios";
 
 import PersonalDetails from "./PersonalDetails";
 import AddressDetails from "./AddressDetails";
 import EducationDetails from "./EducationDetails";
 import PhotoSign from "./PhotoSign";
-import Documents from "./Documents";
+import DocumentUpload from "./Documents";
 import Confirmation from "./Confirmation";
 import StepIndicator from "./StepIndicator";
+import { useToast } from "./ToastProvider";
 
 const FORM_STORAGE_KEY = "multiStepFormData";
 
-const MultiStepForm = () => {
+const steps = [
+  { number: 1, label: "Personal Details", component: PersonalDetails },
+  { number: 2, label: "Address", component: AddressDetails },
+  { number: 3, label: "Education", component: EducationDetails },
+  { number: 4, label: "Photo & Sign", component: PhotoSign },
+  { number: 5, label: "Documents", component: DocumentUpload },
+  { number: 6, label: "Confirmation", component: Confirmation },
+];
+
+const initialValues = {
+  name: "",
+  gender: "",
+  dateOfBirth: "",
+  fathersPhone: "",
+  jeeRollNo: "",
+  fathersName: "",
+  category: "",
+  phone: "",
+  emailId: "",
+  jeeRank: "",
+  addressLine1: "",
+  addressLine2: "",
+  state: "",
+  city: "",
+  zipCode: "",
+  schoolName: "",
+  board: "",
+  percentage: "",
+  passingYear: "",
+  photo: null,
+  signature: null,
+  documents: [],
+};
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required("Required"),
+  gender: Yup.string().required("Required"),
+  dateOfBirth: Yup.string().required("Required"),
+  fathersPhone: Yup.string().required("Required"),
+  jeeRollNo: Yup.string().required("Required"),
+  fathersName: Yup.string().required("Required"),
+  category: Yup.string().required("Required"),
+  phone: Yup.string().required("Required"),
+  emailId: Yup.string().email("Invalid email").required("Required"),
+  jeeRank: Yup.number().required("Required"),
+});
+
+const MultistepComponent = () => {
+  const [step, setStep] = useState(0);
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const [submitError, setSubmitError] = useState(null);
-  const [currentStep, setCurrentStep] = useState(() => {
-    const savedStep = localStorage.getItem("currentFormStep");
-    return savedStep ? parseInt(savedStep, 10) : 1;
-  });
 
-  const formikRef = useRef();
-
-  const steps = [
-    { number: 1, label: "Personal Details", component: PersonalDetails },
-    { number: 2, label: "Address", component: AddressDetails },
-    { number: 3, label: "Education", component: EducationDetails },
-    { number: 4, label: "Photo & Sign", component: PhotoSign },
-    { number: 5, label: "Documents", component: Documents },
-    { number: 6, label: "Confirmation", component: Confirmation },
-  ];
-
-  const getInitialValues = () => {
-    const saved = localStorage.getItem(FORM_STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          personal: {
-            name: '', fathersName: '', gender: '', category: '', dateOfBirth: '',
-            jeeRollNo: '', jeeRank: '', phone: '', fathersPhone: '', emailId: '',
-            ...parsed.personal
-          },
-          address: {
-            permanent: { address: '', state: '', district: '', pin: '', ...parsed.address?.permanent },
-            current: { address: '', state: '', district: '', pin: '', ...parsed.address?.current },
-          },
-          education: {
-            class10: { school: '', board: '', percentage: '', totalMarks: '', ...parsed.education?.class10 },
-            class12: {
-              school: '', board: '', percentage: '', totalMarks: '', pcmPercentage: '',
-              physicsMarks: '', chemistryMarks: '', mathMarks: '', subject4: '', subject4Marks: '',
-              subject5: '', subject5Marks: '', ...parsed.education?.class12
-            }
-          },
-          photoSign: { photo: null, signature: null, ...parsed.photoSign },
-          documents: { ...parsed.documents },
-        };
-      } catch (err) {
-        console.error("Error parsing form data:", err);
-      }
-    }
-    return {
-      personal: {
-        name: '', fathersName: '', gender: '', category: '', dateOfBirth: '',
-        jeeRollNo: '', jeeRank: '', phone: '', fathersPhone: '', emailId: ''
-      },
-      address: {
-        permanent: { address: '', state: '', district: '', pin: '' },
-        current: { address: '', state: '', district: '', pin: '' },
-      },
-      education: {
-        class10: { school: '', board: '', percentage: '', totalMarks: '' },
-        class12: {
-          school: '', board: '', percentage: '', totalMarks: '', pcmPercentage: '',
-          physicsMarks: '', chemistryMarks: '', mathMarks: '', subject4: '', subject4Marks: '',
-          subject5: '', subject5Marks: ''
-        }
-      },
-      photoSign: { photo: null, signature: null },
-      documents: {}
-    }
-  };
-
-  useEffect(() => {
-    localStorage.setItem("currentFormStep", currentStep);
-  }, [currentStep]);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      const formik = formikRef.current;
-      if (formik) {
-        const valuesToSave = { ...formik.values };
-        localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(valuesToSave));
-      }
-    }, 2000);
-    return () => clearTimeout(timeout);
-  }, [formikRef.current?.values]);
-
-  const validationSchema = [
-    Yup.object({
-      personal: Yup.object({
-        name: Yup.string().required(),
-        fathersName: Yup.string().required(),
-        gender: Yup.string().required(),
-        category: Yup.string().required(),
-        dateOfBirth: Yup.date().required(),
-        phone: Yup.string().required(),
-        fathersPhone: Yup.string().required(),
-        emailId: Yup.string().email().required(),
-        jeeRollNo: Yup.string().required(),
-        jeeRank: Yup.number().required(),
-      })
-    }),
-    Yup.object({
-      address: Yup.object({
-        permanent: Yup.object({
-          address: Yup.string().required(),
-          state: Yup.string().required(),
-          district: Yup.string().required(),
-          pin: Yup.string().required(),
-        }),
-        current: Yup.object({
-          address: Yup.string().required(),
-          state: Yup.string().required(),
-          district: Yup.string().required(),
-          pin: Yup.string().required(),
-        })
-      })
-    }),
-    Yup.object({
-      education: Yup.object({
-        class10: Yup.object({
-          school: Yup.string().required(),
-          board: Yup.string().required(),
-          percentage: Yup.number().required(),
-          totalMarks: Yup.number().required(),
-        }),
-        class12: Yup.object({
-          school: Yup.string().required(),
-          board: Yup.string().required(),
-          percentage: Yup.number().required(),
-          totalMarks: Yup.number().required(),
-          pcmPercentage: Yup.number().required(),
-          physicsMarks: Yup.number().required(),
-          chemistryMarks: Yup.number().required(),
-          mathMarks: Yup.number().required(),
-          subject4: Yup.string().required(),
-          subject4Marks: Yup.number().required(),
-          subject5: Yup.string().required(),
-          subject5Marks: Yup.number().required(),
-        })
-      })
-    }),
-    Yup.object({ photoSign: Yup.object({ photo: Yup.mixed().required(), signature: Yup.mixed().required() }) }),
-    Yup.object({ documents: Yup.object().required() }),
-    Yup.object({})
-  ];
-
-  const handleSubmit = async (values, { setSubmitting }) => {
-    if (currentStep !== 6) {
-      setSubmitting(false);
+  const nextStep = async (validateForm, setTouched) => {
+    const formErrors = await validateForm();
+    if (Object.keys(formErrors).length > 0) {
+      setTouched(
+        Object.keys(formErrors).reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {})
+      );
+      toast.error("Please fill in all required fields correctly before proceeding.");
       return;
     }
+    setStep((s) => s + 1);
+  };
+
+  const prevStep = () => setStep((s) => s - 1);
+
+  const handleSubmit = async (values) => {
     try {
-      setSubmitError(null);
-      const formDataToSend = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        if (value instanceof File) {
-          formDataToSend.append(key, value);
-        } else if (value !== null && typeof value === 'object') {
-          formDataToSend.append(key, JSON.stringify(value));
-        } else {
-          formDataToSend.append(key, value);
+      const formData = new FormData();
+
+      formData.append("personal", JSON.stringify({
+        name: values.name,
+        gender: values.gender,
+        dateOfBirth: values.dateOfBirth,
+        fathersPhone: values.fathersPhone,
+        jeeRollNo: values.jeeRollNo,
+        fathersName: values.fathersName,
+        category: values.category,
+        phone: values.phone,
+        emailId: values.emailId,
+        jeeRank: values.jeeRank,
+      }));
+
+      formData.append("address", JSON.stringify({
+        addressLine1: values.addressLine1,
+        addressLine2: values.addressLine2,
+        state: values.state,
+        city: values.city,
+        zipCode: values.zipCode,
+      }));
+
+      formData.append("education", JSON.stringify({
+        schoolName: values.schoolName,
+        board: values.board,
+        percentage: values.percentage,
+        passingYear: values.passingYear,
+      }));
+
+      if (values.photo instanceof File) {
+        formData.append("photo", values.photo);
+      }
+
+      if (values.signature instanceof File) {
+        formData.append("signature", values.signature);
+      }
+
+      values.documents.forEach((doc, index) => {
+        if (doc instanceof File) {
+          formData.append(`documents.${index}`, doc);
         }
       });
 
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/form/submit-form`, {
-        method: 'POST',
-        body: formDataToSend,
-        credentials: 'include'
-      });
-      const data = await res.json();
-
-      if (!res.ok || !data.success) throw new Error(data.message);
-
-      localStorage.removeItem(FORM_STORAGE_KEY);
-      localStorage.removeItem("currentFormStep");
-      setSubmitting(false);
-
-      navigate('/success', {
-        state: {
-          message: 'Form submitted successfully!',
-          submissionId: data.submissionId
+      const response = await axios.post("http://localhost:3000/api/form/submit-form", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-        replace: true
+        withCredentials: true,
       });
-    } catch (error) {
-      setSubmitError(error.message);
-      setSubmitting(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      toast.success("Form submitted successfully");
+      navigate("/");
+    } catch (err) {
+      console.error("Submit error:", err);
+      toast.error("Submission failed: " + (err.response?.data?.message || err.message));
     }
   };
 
-  const handleStepChange = useCallback(async (step, validateForm, setTouched) => {
-    if (step > currentStep) {
-      const currentFields = Object.keys(validationSchema[currentStep - 1]?.fields || {});
-      const errors = await validateForm();
-      const currentErrors = Object.keys(errors).filter((key) => currentFields.includes(key));
-      if (currentErrors.length === 0) {
-        setCurrentStep(step);
-      } else {
-        setTouched(currentErrors.reduce((acc, key) => { acc[key] = true; return acc; }, {}));
-      }
-    } else {
-      setCurrentStep(step);
-    }
-  }, [currentStep]);
-
-  const nextStep = useCallback((validateForm, setTouched) => {
-    if (currentStep < steps.length) {
-      handleStepChange(currentStep + 1, validateForm, setTouched);
-    }
-  }, [currentStep, steps.length, handleStepChange]);
-
-  const prevStep = () => currentStep > 1 && setCurrentStep(currentStep - 1);
-
-  const StepComponent = steps[currentStep - 1].component;
+  const renderStep = (stepIndex, formikProps) => {
+    const StepComponent = steps[stepIndex].component;
+    return (
+      <div>
+        <StepComponent
+          {...formikProps}
+          nextStep={() => nextStep(formikProps.validateForm, formikProps.setTouched)}
+        />
+      </div>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        <StepIndicator currentStep={step + 1} totalSteps={steps.length} />
+
         <Formik
-          innerRef={formikRef}
-          initialValues={getInitialValues()}
-          validationSchema={validationSchema[currentStep - 1]}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
           onSubmit={handleSubmit}
-          validateOnMount={false}
-          validateOnChange={false}
-          validateOnBlur={true}
         >
           {(formikProps) => (
-            <Form>
-              {submitError && <div className="text-red-600 mb-4">{submitError}</div>}
-              <StepIndicator currentStep={currentStep} totalSteps={steps.length} />
-              <StepComponent {...formikProps} />
-              <div className="flex justify-between mt-8">
-                {currentStep > 1 && <button type="button" onClick={prevStep}>Back</button>}
-                {currentStep < 6 ? (
-                  <button type="button" onClick={() => nextStep(formikProps.validateForm, formikProps.setTouched)}>Next</button>
+            <div>
+              <div className="bg-white shadow-md rounded-lg p-6">
+                {renderStep(step, formikProps)}
+              </div>
+
+              <div className="flex justify-center mt-10 space-x-4">
+                {step > 0 && (
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg shadow hover:bg-gray-400 transition-all"
+                  >
+                    Back
+                  </button>
+                )}
+
+                {step < steps.length - 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => nextStep(formikProps.validateForm, formikProps.setTouched)}
+                    className="px-8 py-2 bg-orange-500 text-white rounded-lg shadow hover:bg-orange-600 transition-all"
+                  >
+                    Next
+                  </button>
                 ) : (
-                  <button type="submit" disabled={formikProps.isSubmitting}>
-                    {formikProps.isSubmitting ? 'Submitting...' : 'Submit'}
+                  <button
+                    type="submit"
+                    onClick={formikProps.handleSubmit}
+                    className="px-8 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition-all"
+                  >
+                    Submit
                   </button>
                 )}
               </div>
-            </Form>
+            </div>
           )}
         </Formik>
       </div>
@@ -267,4 +210,4 @@ const MultiStepForm = () => {
   );
 };
 
-export default MultiStepForm;
+export default MultistepComponent;

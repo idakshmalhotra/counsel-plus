@@ -21,27 +21,27 @@ app.use(
   })
 );
 
-// Parse JSON and urlencoded form data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Multer setup for file uploads
-const storage = multer.memoryStorage(); // You can also use diskStorage if needed
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+
+
+const storage = multer.memoryStorage(); 
 const upload = multer({ storage });
 
-// MongoDB Connection
 async function startServer() {
   try {
     await mongoose.connect(
-      ""
+      "mongodb+srv://kbharat84265:SjgpL1UbSskmfFBO@cluster0.tfyruuc.mongodb.net/test04"
     );
-    console.log("✅ MongoDB connected");
+    console.log(" MongoDB connected");
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(` Server running on http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("❌ MongoDB connection error:", error);
+    console.error(" MongoDB connection error:", error);
   }
 }
 startServer();
@@ -65,7 +65,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// User Signin
+
 app.post("/signin", async (req, res) => {
   const { username, password } = req.body;
 
@@ -98,17 +98,16 @@ app.get("/api/validate-token", (req, res) => {
   }
 });
 
-// Dashboard Test Route
+
 app.get("/dashboard", (req, res) => {
   res.json({ username: "Guest", email: "guest@example.com" });
 });
-
-// Form submission route (corrected path and with file support)
+ 
 app.post("/api/form/submit-form", upload.any(), async (req, res) => {
   try {
     const data = {};
 
-    // Handle both fields and files
+  
     req.body && Object.assign(data, req.body);
 
     if (req.files) {
@@ -116,7 +115,7 @@ app.post("/api/form/submit-form", upload.any(), async (req, res) => {
         data[file.fieldname] = {
           originalname: file.originalname,
           mimetype: file.mimetype,
-          buffer: file.buffer.toString("base64"), // Store as base64 or use file.path if diskStorage
+          buffer: file.buffer.toString("base64"), 
         };
       });
     }
