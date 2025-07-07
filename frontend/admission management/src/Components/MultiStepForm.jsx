@@ -79,7 +79,7 @@ const MultistepComponent = () => {
       toast.error("Please fill in all required fields correctly before proceeding.");
       return;
     }
-    setStep((s) => s + 1);
+    setStep((s) => s + 1);``
   };
 
   const prevStep = () => setStep((s) => s - 1);

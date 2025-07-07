@@ -3,15 +3,19 @@ import cors from "cors";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import multer from "multer";
 import path from "path";
-
+import fileUpload from "express-fileupload";
+import { v2 as cloudinary } from "cloudinary";
+import "dotenv/config"; // Load environment variables from .env file
 import { AuthUser } from "./models/auth-user.js";
 import { User } from "./models/user.model.js";
+import authMiddleware from "./middlewares/auth.middleware.js";
 
 const app = express();
 const PORT = 3000;
 const JWT_SECRET = "1234567890";
+
+app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
 
 // CORS config
 app.use(
@@ -21,19 +25,15 @@ app.use(
   })
 );
 
-
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-
-
-const storage = multer.memoryStorage(); 
-const upload = multer({ storage });
+// Removed multer import and usage
 
 async function startServer() {
   try {
     await mongoose.connect(
-      ""
+      "mongodb+srv://kbharat84265:SjgpL1UbSskmfFBO@cluster0.tfyruuc.mongodb.net/test04"
     );
     console.log(" MongoDB connected");
 
@@ -45,6 +45,12 @@ async function startServer() {
   }
 }
 startServer();
+
+cloudinary.config({
+  cloud_name: 'djhohxhtj',
+  api_key: '932662126337887',
+  api_secret: 'Im241iihWcHsyMz1id-fssEX_Sc'
+});
 
 // Test route
 app.get("/", (req, res) => {
@@ -64,7 +70,6 @@ app.post("/signup", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 app.post("/signin", async (req, res) => {
   const { username, password } = req.body;
@@ -98,33 +103,69 @@ app.get("/api/validate-token", (req, res) => {
   }
 });
 
-
 app.get("/dashboard", (req, res) => {
   res.json({ username: "Guest", email: "guest@example.com" });
 });
- 
-app.post("/api/form/submit-form", upload.any(), async (req, res) => {
+
+app.post("/api/form/submit-form",authMiddleware, async (req, res) => {
   try {
-    const data = {};
+    const { pdf } = req.files;
 
-  
-    req.body && Object.assign(data, req.body);
-
-    if (req.files) {
-      req.files.forEach((file) => {
-        data[file.fieldname] = {
-          originalname: file.originalname,
-          mimetype: file.mimetype,
-          buffer: file.buffer.toString("base64"), 
-        };
-      });
+    if (!pdf) {
+      return res.status(400).json({ message: "PDF is required" });
     }
 
-    const saved = await User.create(data);
+    // Upload PDF to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(pdf.tempFilePath, {
+      folder: "admission-pdfs",
+      resource_type: "raw", // 🔑 Important for non-image files
+    });
+
+    const formData = {
+      ...req.body,
+      pdfUrl: uploadResult.secure_url, // You can name this field anything
+    };
+
+    // Convert dateOfBirth to Date object
+    if (formData.dateOfBirth) {
+      formData.dateOfBirth = new Date(formData.dateOfBirth);
+    }
+
+    // Convert number fields
+    const numberFields = [
+      "jeeRank",
+      "class10Percentage",
+      "class10TotalMarks",
+      "class12Percentage",
+      "class12TotalMarks",
+      "class12PCMPercentage",
+      "class12PhysicsMarks",
+      "class12ChemistryMarks",
+      "class12MathMarks",
+      "class12Subject4Marks",
+      "class12Subject5Marks",
+    ];
+    numberFields.forEach((key) => {
+      if (formData[key]) {
+        formData[key] = Number(formData[key]);
+      }
+    });
+
+    // Trim string fields to prevent validation errors
+    const trimFields = ["gender", "category", "phone", "fathersPhone"];
+    trimFields.forEach((key) => {
+      if (formData[key]) {
+        formData[key] = formData[key].trim();
+      }
+    });
+
+    // Save to DB
+    const savedUser = await User.create(formData);
+
     res.status(201).json({
       success: true,
       message: "Form submitted successfully",
-      submissionId: saved._id,
+      submissionId: savedUser._id,
     });
   } catch (error) {
     console.error("Form submission error:", error);

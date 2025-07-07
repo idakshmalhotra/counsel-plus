@@ -1,32 +1,22 @@
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import { ApiError } from "../../utils/ApiError.js";
 import jwt from "jsonwebtoken";
-import { User } from "../models/user.model.js";
+const JWT_SECRET = process.env.JWT_SECRET
+  || "1234567890"; // Default secret, should be replaced with a secure one in production
 
-export const verifyJWT = asyncHandler(async (req, res, next) => {
-  const token =
-    req.cookies?.accessToken || req.header("Authorization")?.replace(/^Bearer\s/, "");
 
+ function authMiddleware(req, res, next) {
+  const token = req.headers.token;
+  
   if (!token) {
-    return next(new ApiError(401, "Access token is missing"));
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   try {
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-
-    const user = await User.findById(decodedToken._id).select("-password -refreshToken");
-
-    if (!user) {
-      return next(new ApiError(401, "Invalid token or user does not exist"));
-    }
-
-    req.user = user;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
     next();
   } catch (error) {
-    const errorMessage =
-      error.name === "TokenExpiredError"
-        ? "Access token has expired"
-        : "Invalid access token";
-    return next(new ApiError(401, errorMessage));
+    console.error("JWT verification error:", error);
+    return res.status(401).json({ message: "Invalid token" });
   }
-});
+}
+export default authMiddleware;

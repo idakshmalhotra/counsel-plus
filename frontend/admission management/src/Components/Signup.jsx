@@ -21,7 +21,7 @@ function Signup() {
     e.preventDefault();
     try {
       // Send user data to backend for registration
-      await axios.post("http://localhost:5000/api/auth/signup", formData);
+      await axios.post("http://localhost:3000/signup", formData);
 
       // Automatically login after signup
       await dispatch(loginUser({
