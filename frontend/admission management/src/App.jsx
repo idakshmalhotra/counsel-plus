@@ -10,7 +10,8 @@ import Footer from "./Components/Footer.jsx";
 import About from "./Components/pages/About.jsx";
 import Plan from "./Components/pages/Plan.jsx";
 import Dashboard from "./Components/pages/Dashboard.jsx";
-import ToastProvider from "./Components/ToastProvider.jsx";
+import { ToastProvider } from "./Components/ToastProvider.jsx";
+
 import { ErrorBoundary } from "react-error-boundary";
 
 const ErrorFallback = ({ error, resetErrorBoundary }) => (

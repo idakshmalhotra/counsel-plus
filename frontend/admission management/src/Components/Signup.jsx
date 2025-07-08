@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { loginUser } from "../redux/user/userSlice"; // ✅ use thunk
 
 function Signup() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -20,16 +17,11 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Send user data to backend for registration
+      // ✅ Send user data to backend for registration
       await axios.post("http://localhost:3000/signup", formData);
 
-      // Automatically login after signup
-      await dispatch(loginUser({
-        username: formData.username,
-        password: formData.password
-      }));
-
-      navigate("/dashboard"); // ✅ redirect after login
+      // ✅ Navigate to login page after successful signup
+      navigate("/signin");
     } catch (err) {
       console.error("Signup error:", err.response?.data || err.message);
     }

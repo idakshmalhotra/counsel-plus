@@ -1,246 +1,54 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { updateFormData } from "../redux/formSlice";
-import TextInput from "./formComponents/TextInput";
-import SelectField from "./formComponents/SelectField";
+import React from "react";
+import { useFormikContext, Field, ErrorMessage } from "formik";
 
-const EducationDetails = (formikProps) => {
-  const { values, errors, touched, handleChange, handleBlur } = formikProps;
-  const dispatch = useDispatch();
+const Input = ({ label, name, placeholder, type = "text" }) => (
+  <div className="w-full md:w-1/2 px-2 mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-1">{label} *</label>
+    <Field
+      name={name}
+      type={type}
+      placeholder={placeholder}
+      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400"
+    />
+    <ErrorMessage name={name} component="div" className="text-red-500 text-sm mt-1" />
+  </div>
+);
 
-  // Update Redux store whenever form values change
-  useEffect(() => {
-    dispatch(
-      updateFormData({
-        section: "education",
-        data: {
-          class10: {
-            school: values.class10School,
-            board: values.class10Board,
-            percentage: values.class10Percentage,
-            totalMarks: values.class10TotalMarks,
-          },
-          class12: {
-            school: values.class12School,
-            board: values.class12Board,
-            percentage: values.class12Percentage,
-            totalMarks: values.class12TotalMarks,
-            pcmPercentage: values.class12PCMPercentage,
-            physicsMarks: values.class12PhysicsMarks,
-            chemistryMarks: values.class12ChemistryMarks,
-            mathsMarks: values.class12MathMarks,
-            subject4: values.class12Subject4,
-            subject4Marks: values.class12Subject4Marks,
-            subject5: values.class12Subject5,
-            subject5Marks: values.class12Subject5Marks,
-          },
-        },
-      })
-    );
-  }, [values, dispatch]);
-
+const EducationDetails = ({ nextStep }) => {
   return (
-    <div className="space-y-8 px-4 sm:space-y-12 max-w-md sm:max-w-5xl mx-auto mt-6 font-satoshi">
-      {/* Class 10 Section */}
-      <div className="border-b-2 pb-8 sm:pb-16 border-gray-400">
-        <h2 className="text-center text-xl font-semibold mb-6">Class 10</h2>
-        <div className="grid grid-cols-1 gap-y-4 sm:gap-y-8 md:grid-cols-2 md:gap-x-8 lg:gap-x-[200px]">
-          <TextInput
-            label="School"
-            name="class10School"
-            type="text"
-            placeholder="Enter your school name"
-            value={values.class10School}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class10School && errors.class10School}
-            required
-          />
-          <SelectField
-            label="Board"
-            name="class10Board"
-            value={values.class10Board}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class10Board && errors.class10Board}
-            required
-            className="w-full"
-          >
-            <option value="">Pick your school board</option>
-            <option value="cbse">CBSE</option>
-            <option value="icse">ICSE</option>
-            <option value="state">State Board</option>
-            <option value="other">Other</option>
-          </SelectField>
-          <TextInput
-            label="Overall Percentage"
-            name="class10Percentage"
-            type="number"
-            placeholder="Enter your percentage"
-            value={values.class10Percentage}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class10Percentage && errors.class10Percentage}
-            required
-          />
-          <TextInput
-            label="Total Marks"
-            name="class10TotalMarks"
-            type="number"
-            placeholder="/500"
-            value={values.class10TotalMarks}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class10TotalMarks && errors.class10TotalMarks}
-            required
-          />
-        </div>
+    <div className="">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">Class 10</h2>
+      <div className="flex flex-wrap">
+        <Input name="class10School" label="School" placeholder="Enter your school name" />
+        <Input name="class10Board" label="Board" placeholder="Pick your school board" />
+        <Input name="class10Percentage" label="Overall Percentage" placeholder="Enter your percentage" />
+        <Input name="class10TotalMarks" label="Total Marks" placeholder="/500" />
       </div>
 
-      {/* Class 12 Section */}
-      <div className="pt-4 sm:pt-8">
-        <h2 className="text-center text-xl font-semibold mb-6">Class 12</h2>
-        <div className="grid grid-cols-1 gap-y-4 sm:gap-y-8 md:grid-cols-2 md:gap-x-8 lg:gap-x-[200px]">
-          <TextInput
-            label="School"
-            name="class12School"
-            type="text"
-            placeholder="Enter your school name"
-            value={values.class12School}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12School && errors.class12School}
-            required
-          />
-          <SelectField
-            label="Board"
-            name="class12Board"
-            value={values.class12Board}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12Board && errors.class12Board}
-            required
-            className="w-full"
-          >
-            <option value="">Pick your school board</option>
-            <option value="cbse">CBSE</option>
-            <option value="icse">ICSE</option>
-            <option value="state">State Board</option>
-            <option value="other">Other</option>
-          </SelectField>
-          <TextInput
-            label="Overall Percentage"
-            name="class12Percentage"
-            type="number"
-            placeholder="Enter your percentage"
-            value={values.class12Percentage}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12Percentage && errors.class12Percentage}
-            required
-          />
-          <TextInput
-            label="Total Marks"
-            name="class12TotalMarks"
-            type="number"
-            placeholder="/500"
-            value={values.class12TotalMarks}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12TotalMarks && errors.class12TotalMarks}
-            required
-          />
-          <TextInput
-            label="PCM Percentage"
-            name="class12PCMPercentage"
-            type="number"
-            placeholder="Enter your PCM percentage"
-            value={values.class12PCMPercentage}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12PCMPercentage && errors.class12PCMPercentage}
-            required
-          />
-          <TextInput
-            label="Marks in Physics"
-            name="class12PhysicsMarks"
-            type="number"
-            placeholder="/100"
-            value={values.class12PhysicsMarks}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12PhysicsMarks && errors.class12PhysicsMarks}
-            required
-          />
-          <TextInput
-            label="Marks in Chemistry"
-            name="class12ChemistryMarks"
-            type="number"
-            placeholder="/100"
-            value={values.class12ChemistryMarks}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={
-              touched.class12ChemistryMarks && errors.class12ChemistryMarks
-            }
-            required
-          />
-          <TextInput
-            label="Marks in Mathematics"
-            name="class12MathMarks"
-            type="number"
-            placeholder="/100"
-            value={values.class12MathMarks}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12MathMarks && errors.class12MathMarks}
-            required
-          />
-          <TextInput
-            label="Subject 4"
-            name="class12Subject4"
-            type="text"
-            placeholder="Enter subject name"
-            value={values.class12Subject4}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12Subject4 && errors.class12Subject4}
-            required
-          />
-          <TextInput
-            label="Marks in Subject 4"
-            name="class12Subject4Marks"
-            type="number"
-            placeholder="/100"
-            value={values.class12Subject4Marks}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12Subject4Marks && errors.class12Subject4Marks}
-            required
-          />
-          <TextInput
-            label="Subject 5"
-            name="class12Subject5"
-            type="text"
-            placeholder="Enter subject name"
-            value={values.class12Subject5}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12Subject5 && errors.class12Subject5}
-            required
-          />
-          <TextInput
-            label="Marks in Subject 5"
-            name="class12Subject5Marks"
-            type="number"
-            placeholder="/100"
-            value={values.class12Subject5Marks}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.class12Subject5Marks && errors.class12Subject5Marks}
-            required
-          />
-        </div>
+      <h2 className="text-xl font-semibold text-gray-800 mb-4 mt-8">Class 12</h2>
+      <div className="flex flex-wrap">
+        <Input name="class12School" label="School" placeholder="Enter your school name" />
+        <Input name="class12Board" label="Board" placeholder="Pick your school board" />
+        <Input name="class12Percentage" label="Overall Percentage" placeholder="Enter your percentage" />
+        <Input name="class12TotalMarks" label="Total Marks" placeholder="/500" />
+        <Input name="class12PCMPercentage" label="PCM Percentage" placeholder="Enter your PCM percentage" />
+        <Input name="class12PhysicsMarks" label="Marks in Physics" placeholder="/100" />
+        <Input name="class12ChemistryMarks" label="Marks in Chemistry" placeholder="/100" />
+        <Input name="class12MathMarks" label="Marks in Mathematics" placeholder="/100" />
+        <Input name="class12Subject4" label="Subject 4" placeholder="Enter subject name" />
+        <Input name="class12Subject4Marks" label="Marks in Subject 4" placeholder="/100" />
+        <Input name="class12Subject5" label="Subject 5" placeholder="Enter subject name" />
+        <Input name="class12Subject5Marks" label="Marks in Subject 5" placeholder="/100" />
+      </div>
+
+      <div className="flex justify-end mt-8">
+        <button
+          type="button"
+          onClick={nextStep}
+          className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

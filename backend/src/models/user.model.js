@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
   class12Subject5Marks: { type: Number, required: true, min: 0, max: 100 },
 
   // Photo & Signature URLs (Cloudinary)
-  pdfUrl: { type: String, required: true },
+  pdfUrl: { type: String, required: false },
   
 
   // Document URLs (Cloudinary)

@@ -62,14 +62,27 @@ app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
+    // Check if username or email already exists
+    const existingUser = await AuthUser.findOne({
+      $or: [{ username }, { email }],
+    });
+
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ message: "Username or email already exists" });
+    }
+
     const hashedPassword = bcrypt.hashSync(password, 10);
     await AuthUser.create({ username, email, password: hashedPassword });
+
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
     console.error("Signup error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 app.post("/signin", async (req, res) => {
   const { username, password } = req.body;
@@ -90,85 +103,59 @@ app.post("/signin", async (req, res) => {
 });
 
 // Token validation
-app.get("/api/validate-token", (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ msg: "No token provided" });
-
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    res.status(200).json({ valid: true, userId: decoded.id });
-  } catch (err) {
-    return res.status(401).json({ msg: "Invalid token" });
-  }
+app.get("/api/validate-token", authMiddleware, (req, res) => {
+  res.status(200).json({ valid: true, userId: req.user.id });
 });
+
 
 app.get("/dashboard", (req, res) => {
   res.json({ username: "Guest", email: "guest@example.com" });
 });
 
-app.post("/api/form/submit-form",authMiddleware, async (req, res) => {
+app.post("/api/form/submit-form", async (req, res) => {
   try {
     const { pdf } = req.files;
-
-    if (!pdf) {
-      return res.status(400).json({ message: "PDF is required" });
-    }
+    if (!pdf) return res.status(400).json({ message: "PDF is required" });
 
     // Upload PDF to Cloudinary
     const uploadResult = await cloudinary.uploader.upload(pdf.tempFilePath, {
       folder: "admission-pdfs",
-      resource_type: "raw", // 🔑 Important for non-image files
+      resource_type: "raw",
     });
 
     const formData = {
       ...req.body,
-      pdfUrl: uploadResult.secure_url, // You can name this field anything
+      pdfUrl: uploadResult.secure_url,
     };
 
-    // Convert dateOfBirth to Date object
-    if (formData.dateOfBirth) {
-      formData.dateOfBirth = new Date(formData.dateOfBirth);
-    }
-
-    // Convert number fields
+    // Date and number conversions
+    if (formData.dateOfBirth) formData.dateOfBirth = new Date(formData.dateOfBirth);
     const numberFields = [
-      "jeeRank",
-      "class10Percentage",
-      "class10TotalMarks",
-      "class12Percentage",
-      "class12TotalMarks",
-      "class12PCMPercentage",
-      "class12PhysicsMarks",
-      "class12ChemistryMarks",
-      "class12MathMarks",
-      "class12Subject4Marks",
-      "class12Subject5Marks",
+      "jeeRank", "class10Percentage", "class10TotalMarks",
+      "class12Percentage", "class12TotalMarks", "class12PCMPercentage",
+      "class12PhysicsMarks", "class12ChemistryMarks", "class12MathMarks",
+      "class12Subject4Marks", "class12Subject5Marks",
     ];
     numberFields.forEach((key) => {
-      if (formData[key]) {
-        formData[key] = Number(formData[key]);
-      }
+      if (formData[key]) formData[key] = Number(formData[key]);
     });
 
-    // Trim string fields to prevent validation errors
+    // Trim string fields
     const trimFields = ["gender", "category", "phone", "fathersPhone"];
     trimFields.forEach((key) => {
-      if (formData[key]) {
-        formData[key] = formData[key].trim();
-      }
+      if (formData[key]) formData[key] = formData[key].trim();
     });
 
-    // Save to DB
+    // Log form data before saving
+    console.log("Saving form data:", formData);
+
+    // ✅ Save
     const savedUser = await User.create(formData);
-
-    res.status(201).json({
-      success: true,
-      message: "Form submitted successfully",
-      submissionId: savedUser._id,
-    });
+    res.status(201).json({ success: true, message: "Form submitted", id: savedUser._id });
   } catch (error) {
-    console.error("Form submission error:", error);
-    res.status(500).json({ message: "Failed to submit form" });
+    console.error("❌ Mongoose Validation Error:", error?.errors);
+    console.error("❌ Full error:", error);
+    res.status(500).json({ message: "Failed to submit form", error: error.message });
   }
 });
+
