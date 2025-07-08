@@ -33,7 +33,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 async function startServer() {
   try {
     await mongoose.connect(
-      "mongodb+srv://kbharat84265:SjgpL1UbSskmfFBO@cluster0.tfyruuc.mongodb.net/test04"
+      ""
     );
     console.log(" MongoDB connected");
 
@@ -47,9 +47,9 @@ async function startServer() {
 startServer();
 
 cloudinary.config({
-  cloud_name: 'djhohxhtj',
-  api_key: '932662126337887',
-  api_secret: 'Im241iihWcHsyMz1id-fssEX_Sc'
+  cloud_name: '',
+  api_key: '',
+  api_secret: ''
 });
 
 // Test route
