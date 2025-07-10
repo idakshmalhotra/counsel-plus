@@ -1,7 +1,8 @@
 import React from "react";
+import { createBrowserRouter, Outlet, RouterProvider, Navigate } from "react-router-dom";
+
 import Signup from "./Components/Signup.jsx";
 import Login from "./Components/Login.jsx";
-import { createBrowserRouter, Outlet, RouterProvider, Navigate } from "react-router-dom";
 import MultiStepForm from "./Components/MultiStepForm.jsx";
 import Hero from "./Components/Hero.jsx";
 import Navbar from "./Components/Navbar.jsx";
@@ -10,6 +11,7 @@ import About from "./Components/pages/About.jsx";
 import Plan from "./Components/pages/Plan.jsx";
 import Dashboard from "./Components/pages/Dashboard.jsx";
 import AdminDashboard from "./Components/adminDashboard.jsx";
+import ForgotPassword from "./ForgetPassword.jsx";
 import { ToastProvider } from "./Components/ToastProvider.jsx";
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -35,7 +37,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => (
   </div>
 );
 
-// Layout for shared Navbar + Footer
+// Shared layout with navbar + footer
 function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -50,7 +52,7 @@ function Layout() {
   );
 }
 
-// Admin route guard
+// Route protection logic
 function ProtectedRoute({ children, adminOnly = false }) {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
@@ -62,7 +64,7 @@ function ProtectedRoute({ children, adminOnly = false }) {
   return children;
 }
 
-
+// Router config
 const router = createBrowserRouter([
   {
     path: "/",
@@ -75,6 +77,7 @@ const router = createBrowserRouter([
       { path: "/signup", element: <Signup /> },
       { path: "/signin", element: <Login /> },
       { path: "/admission", element: <MultiStepForm /> },
+      { path: "/forgot-password", element: <ForgotPassword /> },
       {
         path: "/admin",
         element: (
@@ -82,8 +85,7 @@ const router = createBrowserRouter([
             <AdminDashboard />
           </ProtectedRoute>
         ),
-      }
-      ,
+      },
     ],
   },
 ]);
