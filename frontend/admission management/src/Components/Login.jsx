@@ -1,72 +1,71 @@
-import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-function Login() {
-  const usernameref = useRef();
-  const passwordref = useRef();
+const Login = () => {
   const navigate = useNavigate();
+  const [form, setForm] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
 
-  const handleLogin = async (e) => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const username = usernameref.current.value;
-    const password = passwordref.current.value;
+    setError("");
 
     try {
-      const response = await axios.post("http://localhost:3000/signin", {
-        username,
-        password,
-      });
+      const res = await axios.post("http://localhost:3000/signin", form);
 
-      const token = response.data.token;
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role); // 👈 Save role
 
-      console.log("Login successful:", response.data);
-      console.log("Redirecting to dashboard...");
-
-      alert("Login successful!");
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Login failed:", error);
-      alert("Login failed. Please check your credentials.");
+      // Redirect based on role
+      if (res.data.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      setError(err.response?.data?.msg || "Login failed");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2" htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              required
-              ref={usernameref}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2" htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              required
-              ref={passwordref}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-200"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded shadow w-full max-w-sm"
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center">Sign In</h2>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <input
+          name="username"
+          value={form.username}
+          onChange={handleChange}
+          placeholder="Username"
+          className="w-full mb-3 p-2 border rounded"
+          required
+        />
+        <input
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          type="password"
+          placeholder="Password"
+          className="w-full mb-4 p-2 border rounded"
+          required
+        />
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Sign In
+        </button>
+      </form>
     </div>
   );
-}
+};
 
 export default Login;

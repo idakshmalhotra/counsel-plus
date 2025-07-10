@@ -1,3 +1,5 @@
+// Components/adminDashboard.jsx
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -20,16 +22,19 @@ const AdminDashboard = () => {
 
       if (!validate.data.valid) throw new Error("Token invalid");
 
+      const basicAuth = btoa("admin:admin123");
+
       const res = await axios.get("http://localhost:3000/api/admin/all-submissions", {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
+        headers: {
+          Authorization: `Basic ${basicAuth}`,
+        },
       });
 
       setStudents(res.data);
       setFiltered(res.data);
     } catch (err) {
       console.error("Auth or data fetch failed:", err);
-      navigate("/login");
+      navigate("/signin");
     }
   };
 
@@ -98,9 +103,7 @@ const AdminDashboard = () => {
                   <td className="p-2 border">{student.emailId}</td>
                   <td className="p-2 border">{student.phone}</td>
                   <td className="p-2 border">{student.jeeRank}</td>
-                  <td className="p-2 border">
-                    {student.dateOfBirth?.slice(0, 10)}
-                  </td>
+                  <td className="p-2 border">{student.dateOfBirth?.slice(0, 10)}</td>
                   <td className="p-2 border">{student.category}</td>
                   <td className="p-2 border">
                     <a

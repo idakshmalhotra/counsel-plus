@@ -51,10 +51,17 @@ function Layout() {
 }
 
 // Admin route guard
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, adminOnly = false }) {
   const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/signin" />;
+  const role = localStorage.getItem("role");
+
+  if (!token) return <Navigate to="/signin" />;
+
+  if (adminOnly && role !== "admin") return <Navigate to="/dashboard" />;
+
+  return children;
 }
+
 
 const router = createBrowserRouter([
   {
@@ -71,11 +78,12 @@ const router = createBrowserRouter([
       {
         path: "/admin",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute adminOnly={true}>
             <AdminDashboard />
           </ProtectedRoute>
         ),
-      },
+      }
+      ,
     ],
   },
 ]);

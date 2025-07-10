@@ -3,21 +3,23 @@ import cors from "cors";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import path from "path";
 import fileUpload from "express-fileupload";
 import { v2 as cloudinary } from "cloudinary";
-import "dotenv/config"; // Load environment variables from .env file
+import "dotenv/config";
+
 import { AuthUser } from "./models/auth-user.js";
 import { User } from "./models/user.model.js";
 import authMiddleware from "./middlewares/auth.middleware.js";
+import adminMiddleware from "./middlewares/adminMiddleware.js";
 
 const app = express();
 const PORT = 3000;
-const JWT_SECRET = "1234567890";
+const JWT_SECRET = process.env.JWT_SECRET || "1234567890";
 
+// ✅ File Upload
 app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
 
-// CORS config
+// ✅ CORS
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -25,52 +27,44 @@ app.use(
   })
 );
 
+// ✅ Body Parser
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// Removed multer import and usage
-
+// ✅ Connect to MongoDB
 async function startServer() {
   try {
     await mongoose.connect(
+      process.env.MONGO_URI ||
+        "mongodb+srv://kbharat84265:SjgpL1UbSskmfFBO@cluster0.tfyruuc.mongodb.net/test04"
     );
-    console.log(" MongoDB connected");
-
-    app.listen(PORT, () => {
-      console.log(` Server running on http://localhost:${PORT}`);
-    });
+    console.log("✅ MongoDB connected");
+    app.listen(PORT, () => console.log(`🚀 Server at http://localhost:${PORT}`));
   } catch (error) {
-    console.error(" MongoDB connection error:", error);
+    console.error("❌ MongoDB connection error:", error);
   }
 }
 startServer();
 
+// ✅ Cloudinary
 cloudinary.config({
-  cloud_name: '',
-  api_key: '',
-  api_secret: ''
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "djhohxhtj",
+  api_key: process.env.CLOUDINARY_API_KEY || "932662126337887",
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Test route
+// ✅ Routes
 app.get("/", (req, res) => {
   res.json("Server is live");
 });
 
-// User Signup
+// ✅ Signup
 app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // Check if username or email already exists
-    const existingUser = await AuthUser.findOne({
-      $or: [{ username }, { email }],
-    });
-
-    if (existingUser) {
-      return res
-        .status(409)
-        .json({ message: "Username or email already exists" });
-    }
+    const existingUser = await AuthUser.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) return res.status(409).json({ message: "Username or email exists" });
 
     const hashedPassword = bcrypt.hashSync(password, 10);
     await AuthUser.create({ username, email, password: hashedPassword });
@@ -82,7 +76,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-
+// ✅ Signin — returns role ("admin" or "user")
 app.post("/signin", async (req, res) => {
   const { username, password } = req.body;
 
@@ -94,29 +88,26 @@ app.post("/signin", async (req, res) => {
     if (!isMatch) return res.status(400).json({ msg: "Incorrect password" });
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
-    res.json({ token });
+    const role = username === "admin" ? "admin" : "user";
+
+    res.json({ token, role });
   } catch (e) {
     console.error("Signin error:", e);
     res.status(500).json({ msg: "Error signing in" });
   }
 });
 
-// Token validation
+// ✅ Token validation
 app.get("/api/validate-token", authMiddleware, (req, res) => {
   res.status(200).json({ valid: true, userId: req.user.id });
 });
 
-
-app.get("/dashboard", (req, res) => {
-  res.json({ username: "Guest", email: "guest@example.com" });
-});
-
+// ✅ Form submission with Cloudinary PDF upload
 app.post("/api/form/submit-form", async (req, res) => {
   try {
     const { pdf } = req.files;
     if (!pdf) return res.status(400).json({ message: "PDF is required" });
 
-    // Upload PDF to Cloudinary
     const uploadResult = await cloudinary.uploader.upload(pdf.tempFilePath, {
       folder: "admission-pdfs",
       resource_type: "raw",
@@ -127,8 +118,9 @@ app.post("/api/form/submit-form", async (req, res) => {
       pdfUrl: uploadResult.secure_url,
     };
 
-    // Date and number conversions
+    // Convert dates and numbers
     if (formData.dateOfBirth) formData.dateOfBirth = new Date(formData.dateOfBirth);
+
     const numberFields = [
       "jeeRank", "class10Percentage", "class10TotalMarks",
       "class12Percentage", "class12TotalMarks", "class12PCMPercentage",
@@ -139,31 +131,26 @@ app.post("/api/form/submit-form", async (req, res) => {
       if (formData[key]) formData[key] = Number(formData[key]);
     });
 
-    // Trim string fields
     const trimFields = ["gender", "category", "phone", "fathersPhone"];
     trimFields.forEach((key) => {
       if (formData[key]) formData[key] = formData[key].trim();
     });
 
-    // Log form data before saving
-    console.log("Saving form data:", formData);
-
-    // ✅ Save
     const savedUser = await User.create(formData);
     res.status(201).json({ success: true, message: "Form submitted", id: savedUser._id });
   } catch (error) {
-    console.error("❌ Mongoose Validation Error:", error?.errors);
-    console.error("❌ Full error:", error);
+    console.error("Form error:", error);
     res.status(500).json({ message: "Failed to submit form", error: error.message });
   }
 });
 
-app.get("/api/admin/all-submissions", authMiddleware, async (req, res) => {
+// ✅ Admin-only route with Basic Auth
+app.get("/api/admin/all-submissions", adminMiddleware, async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
   } catch (err) {
-    console.error("❌ Failed to fetch submissions:", err);
+    console.error("❌ Fetch error:", err);
     res.status(500).json({ message: "Failed to fetch student data" });
   }
 });
