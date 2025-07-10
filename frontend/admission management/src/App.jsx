@@ -1,8 +1,7 @@
-// App.jsx
 import React from "react";
 import Signup from "./Components/Signup.jsx";
 import Login from "./Components/Login.jsx";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider, Navigate } from "react-router-dom";
 import MultiStepForm from "./Components/MultiStepForm.jsx";
 import Hero from "./Components/Hero.jsx";
 import Navbar from "./Components/Navbar.jsx";
@@ -10,10 +9,11 @@ import Footer from "./Components/Footer.jsx";
 import About from "./Components/pages/About.jsx";
 import Plan from "./Components/pages/Plan.jsx";
 import Dashboard from "./Components/pages/Dashboard.jsx";
+import AdminDashboard from "./Components/adminDashboard.jsx";
 import { ToastProvider } from "./Components/ToastProvider.jsx";
-
 import { ErrorBoundary } from "react-error-boundary";
 
+// Fallback UI for errors
 const ErrorFallback = ({ error, resetErrorBoundary }) => (
   <div className="min-h-screen flex flex-col">
     <div className="p-6 shadow bg-white border-b border-gray-200">
@@ -35,6 +35,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => (
   </div>
 );
 
+// Layout for shared Navbar + Footer
 function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
@@ -49,6 +50,12 @@ function Layout() {
   );
 }
 
+// Admin route guard
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/signin" />;
+}
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -59,8 +66,16 @@ const router = createBrowserRouter([
       { path: "/plan", element: <Plan /> },
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/signup", element: <Signup /> },
-      { path: "/signin", element: <Login /> }, // ✅ changed to /signin for consistency
+      { path: "/signin", element: <Login /> },
       { path: "/admission", element: <MultiStepForm /> },
+      {
+        path: "/admin",
+        element: (
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        ),
+      },
     ],
   },
 ]);

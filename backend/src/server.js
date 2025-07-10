@@ -33,7 +33,6 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 async function startServer() {
   try {
     await mongoose.connect(
-      ""
     );
     console.log(" MongoDB connected");
 
@@ -159,3 +158,12 @@ app.post("/api/form/submit-form", async (req, res) => {
   }
 });
 
+app.get("/api/admin/all-submissions", authMiddleware, async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (err) {
+    console.error("❌ Failed to fetch submissions:", err);
+    res.status(500).json({ message: "Failed to fetch student data" });
+  }
+});
