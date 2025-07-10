@@ -7,30 +7,7 @@ function Dashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const applications = [
-    {
-      id: 1,
-      institution: "University of Technology",
-      program: "Computer Science",
-      status: "Under Review",
-      submittedDate: "2024-01-15",
-      deadline: "2024-02-15",
-    },
-    {
-      id: 2,
-      institution: "State University",
-      program: "Business Administration",
-      status: "Accepted",
-      submittedDate: "2024-01-10",
-      deadline: "2024-02-01",
-    },
-    {
-      id: 3,
-      institution: "City College",
-      program: "Engineering",
-      status: "Pending Documents",
-      submittedDate: "2024-01-20",
-      deadline: "2024-02-28",
-    },
+    
   ];
 
   useEffect(() => {

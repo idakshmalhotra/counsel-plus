@@ -154,3 +154,14 @@ app.get("/api/admin/all-submissions", adminMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch student data" });
   }
 });
+app.get("/api/user/form", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const data = await User.findOne({ userId }); // Assuming userId is saved in form
+    if (!data) return res.status(404).json({ message: "No form found" });
+    res.json(data);
+  } catch (err) {
+    console.error("Fetch user form error:", err);
+    res.status(500).json({ message: "Failed to fetch form data" });
+  }
+});
