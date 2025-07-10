@@ -1,51 +1,79 @@
 import React from "react";
 import {
-  FaUser,
-  FaMapMarkedAlt,
-  FaSchool,
-  FaFileImage,
-  FaFileUpload,
-  FaCheckCircle,
-} from "react-icons/fa";
+  FiUser,
+  FiMapPin,
+  FiBookOpen,
+  FiFileText,
+  FiCheck,
+} from "react-icons/fi";
 
 const steps = [
-  { label: "Personal Details", icon: <FaUser /> },
-  { label: "Address", icon: <FaMapMarkedAlt /> },
-  { label: "Education", icon: <FaSchool /> },
-  { label: "Photo & Sign", icon: <FaFileImage /> },
-  { label: "Documents", icon: <FaFileUpload /> },
-  { label: "Confirmation", icon: <FaCheckCircle /> },
+  { label: "Personal Details", icon: <FiUser className="w-5 h-5" /> },
+  { label: "Address Details", icon: <FiMapPin className="w-5 h-5" /> },
+  { label: "Education Details", icon: <FiBookOpen className="w-5 h-5" /> },
+  { label: "Upload PDF", icon: <FiFileText className="w-5 h-5" /> },
+  { label: "Preview", icon: <FiCheck className="w-5 h-5" /> },
 ];
 
 const StepIndicator = ({ currentStep }) => {
   return (
-    <div className="flex justify-between items-center mb-10 px-2 md:px-10">
+    <div className="flex justify-between items-center">
       {steps.map((step, index) => {
         const stepNumber = index + 1;
-        const isActive = currentStep === stepNumber;
-        const isCompleted = currentStep > stepNumber;
+        const isActive = currentStep === index;
+        const isCompleted = currentStep > index;
 
         return (
-          <div key={index} className="flex-1 flex flex-col items-center">
-            <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full text-white ${
-                isCompleted
-                  ? "bg-green-500"
-                  : isActive
-                  ? "bg-orange-500"
-                  : "bg-gray-300"
-              }`}
-            >
-              {step.icon}
+          <div key={index} className="flex-1 flex flex-col items-center relative">
+            {/* Step Circle */}
+            <div className="relative">
+              <div
+                className={`w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 transform ${
+                  isCompleted
+                    ? "bg-white text-green-600 shadow-lg scale-110"
+                    : isActive
+                    ? "bg-white text-orange-600 shadow-lg scale-110"
+                    : "bg-white/20 text-white/60"
+                }`}
+              >
+                {isCompleted ? (
+                  <FiCheck className="w-6 h-6" />
+                ) : (
+                  step.icon
+                )}
+              </div>
+              
+              {/* Step Number */}
+              {!isCompleted && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                  <span className="text-xs font-bold text-orange-600">{stepNumber}</span>
+                </div>
+              )}
             </div>
-            <span
-              className={`text-sm text-center mt-2 ${
-                isCompleted || isActive ? "text-black font-semibold" : "text-gray-400"
-              }`}
-            >
-              {step.label}
-            </span>
-            <span className="text-xs text-gray-500">Step {stepNumber}</span>
+
+            {/* Step Label */}
+            <div className="mt-3 text-center">
+              <span
+                className={`text-sm font-medium transition-all duration-300 ${
+                  isCompleted || isActive 
+                    ? "text-white font-semibold" 
+                    : "text-white/60"
+                }`}
+              >
+                {step.label}
+              </span>
+            </div>
+
+            {/* Connector Line */}
+            {index < steps.length - 1 && (
+              <div className="absolute top-6 left-1/2 w-full h-0.5 bg-white/20">
+                <div 
+                  className={`h-full bg-white transition-all duration-500 ease-out ${
+                    isCompleted ? 'w-full' : 'w-0'
+                  }`}
+                />
+              </div>
+            )}
           </div>
         );
       })}

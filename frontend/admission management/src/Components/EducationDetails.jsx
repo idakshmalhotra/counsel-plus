@@ -21,24 +21,24 @@ const EducationDetails = ({ nextStep }) => {
       <div className="flex flex-wrap">
         <Input name="class10School" label="School" placeholder="Enter your school name" />
         <Input name="class10Board" label="Board" placeholder="Pick your school board" />
-        <Input name="class10Percentage" label="Overall Percentage" placeholder="Enter your percentage" />
-        <Input name="class10TotalMarks" label="Total Marks" placeholder="/500" />
+        <Input name="class10Percentage" label="Overall Percentage" placeholder="Enter your percentage" type="number" />
+        <Input name="class10TotalMarks" label="Total Marks" placeholder="/500" type="number" />
       </div>
 
       <h2 className="text-xl font-semibold text-gray-800 mb-4 mt-8">Class 12</h2>
       <div className="flex flex-wrap">
         <Input name="class12School" label="School" placeholder="Enter your school name" />
         <Input name="class12Board" label="Board" placeholder="Pick your school board" />
-        <Input name="class12Percentage" label="Overall Percentage" placeholder="Enter your percentage" />
-        <Input name="class12TotalMarks" label="Total Marks" placeholder="/500" />
-        <Input name="class12PCMPercentage" label="PCM Percentage" placeholder="Enter your PCM percentage" />
-        <Input name="class12PhysicsMarks" label="Marks in Physics" placeholder="/100" />
-        <Input name="class12ChemistryMarks" label="Marks in Chemistry" placeholder="/100" />
-        <Input name="class12MathMarks" label="Marks in Mathematics" placeholder="/100" />
+        <Input name="class12Percentage" label="Overall Percentage" placeholder="Enter your percentage" type="number" />
+        <Input name="class12TotalMarks" label="Total Marks" placeholder="/500" type="number" />
+        <Input name="class12PCMPercentage" label="PCM Percentage" placeholder="Enter your PCM percentage" type="number" />
+        <Input name="class12PhysicsMarks" label="Marks in Physics" placeholder="/100" type="number" />
+        <Input name="class12ChemistryMarks" label="Marks in Chemistry" placeholder="/100" type="number" />
+        <Input name="class12MathMarks" label="Marks in Mathematics" placeholder="/100" type="number" />
         <Input name="class12Subject4" label="Subject 4" placeholder="Enter subject name" />
-        <Input name="class12Subject4Marks" label="Marks in Subject 4" placeholder="/100" />
+        <Input name="class12Subject4Marks" label="Marks in Subject 4" placeholder="/100" type="number" />
         <Input name="class12Subject5" label="Subject 5" placeholder="Enter subject name" />
-        <Input name="class12Subject5Marks" label="Marks in Subject 5" placeholder="/100" />
+        <Input name="class12Subject5Marks" label="Marks in Subject 5" placeholder="/100" type="number" />
       </div>
 
       <div className="flex justify-end mt-8">

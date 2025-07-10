@@ -147,6 +147,7 @@ const PersonalDetails = ({ nextStep }) => {
           <label className="block text-sm font-medium text-gray-700">JEE Roll No</label>
           <input
             name="jeeRollNo"
+            type="number"
             value={values.jeeRollNo}
             onChange={handleChange}
             onBlur={() => setFieldTouched("jeeRollNo")}

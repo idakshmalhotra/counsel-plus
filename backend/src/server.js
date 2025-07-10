@@ -154,6 +154,27 @@ app.get("/api/admin/all-submissions", adminMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch student data" });
   }
 });
+
+// ✅ Route for dashboard to view submitted applications (JWT auth)
+app.get("/api/submissions", authMiddleware, async (req, res) => {
+  try {
+    // Only fetch students who have submitted their applications
+    // We can identify submitted applications by checking if they have required fields
+    const submittedApplications = await User.find({
+      $and: [
+        { name: { $exists: true, $ne: "" } },
+        { emailId: { $exists: true, $ne: "" } },
+        { jeeRank: { $exists: true, $ne: "" } },
+        { phone: { $exists: true, $ne: "" } }
+      ]
+    }).sort({ createdAt: -1 });
+    
+    res.json(submittedApplications);
+  } catch (err) {
+    console.error("❌ Fetch error:", err);
+    res.status(500).json({ message: "Failed to fetch student data" });
+  }
+});
 app.get("/api/user/form", authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
