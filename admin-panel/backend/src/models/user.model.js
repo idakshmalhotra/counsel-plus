@@ -42,40 +42,16 @@ const userSchema = new mongoose.Schema({
   class12Subject5Marks: { type: Number, required: true, min: 0, max: 100 },
 
   // Photo & Signature URLs (Cloudinary)
-  photo: { type: String, required: true },
-  signature: { type: String, required: true },
+  pdfUrl: { type: String, required: false },
+  
 
   // Document URLs (Cloudinary)
-  documents: {
-    jeeAdmitCard: { type: String, required: true },
-    jeeResult: { type: String, required: true },
-    registrationSlip: { type: String, required: true },
-    allotmentLetter: { type: String, required: true },
-    academicFeeReceipt: { type: String, required: true },
-    balanceFeeReceipt: { type: String, required: true },
-    tenthCertificate: { type: String, required: true },
-    twelfthCertificate: { type: String, required: true },
-    casteCertificate: { type: String },
-    medicalFitness: { type: String, required: true },
-    characterCertificate: { type: String, required: true },
-    photographs: { type: String, required: true },
-    gapYearUndertaking: { type: String },
-    antiRaggingStudent: { type: String, required: true },
-    antiRaggingParent: { type: String, required: true },
-    attendanceStudent: { type: String, required: true },
-    attendanceParent: { type: String, required: true }
-  },
+ 
 
   // Payment Details
-  paymentMethod: { type: String },
-  cardNumber: { type: String },
-  paymentStatus: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
+  
+  
 
-  // admin
-  adminStatus: { type: String, enum: ['pending', 'under_review', 'accepted', 'rejected'], default: 'pending' },
-  reviewedBy: { type: String },
-  reviewDate: { type: Date },
-  adminComments: { type: String },
 
   submittedAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

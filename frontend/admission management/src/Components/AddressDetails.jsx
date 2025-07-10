@@ -1,144 +1,87 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { updateFormData } from "../redux/formSlice";
-import TextInput from "./formComponents/TextInput";
+import { useFormikContext } from "formik";
 
-const AdressDetails = (formikProps) => {
-  const { values, errors, touched, handleChange, handleBlur } = formikProps;
-  const dispatch = useDispatch();
+const AddressDetails = ({ nextStep, prevStep }) => {
+  const {
+    values,
+    handleChange,
+    errors,
+    touched,
+    setFieldTouched,
+    setValues,
+  } = useFormikContext();
 
-  // Update Redux store whenever form values change
   useEffect(() => {
-    dispatch(
-      updateFormData({
-        section: "address",
-        data: {
-          permanent: {
-            address: values.permanentAddress,
-            state: values.permanentState,
-            district: values.permanentDistrict,
-            pin: values.permanentPin,
-          },
-          current: {
-            address: values.currentAddress,
-            state: values.currentState,
-            district: values.currentDistrict,
-            pin: values.currentPin,
-          },
-        },
-      })
-    );
-  }, [values, dispatch]);
+    const saved = localStorage.getItem("counselingAdmissionFormData");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setValues((prev) => ({ ...prev, ...parsed }));
+    }
+  }, [setValues]);
+
+  useEffect(() => {
+    localStorage.setItem("counselingAdmissionFormData", JSON.stringify(values));
+  }, [values]);
+
+  const fields = [
+    { label: "Permanent Address", name: "permanentAddress" },
+    { label: "Permanent State", name: "permanentState" },
+    { label: "Permanent District", name: "permanentDistrict" },
+    { label: "Permanent Pin", name: "permanentPin" },
+    { label: "Current Address", name: "currentAddress" },
+    { label: "Current State", name: "currentState" },
+    { label: "Current District", name: "currentDistrict" },
+    { label: "Current Pin", name: "currentPin" },
+  ];
 
   return (
-    <div className="px-4 max-w-sm mx-auto md:max-w-5xl md:mx-auto mt-6 font-satoshi">
-      {/* Permanent Address Section */}
-      <div className="border-b-2 pb-8 md:pb-16 border-gray-300">
-        <h2 className="text-xl font-semibold mb-6 text-center">
-          Permanent Address
-        </h2>
-        <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-[200px] md:gap-y-8">
-          <TextInput
-            label="Address"
-            name="permanentAddress"
-            type="text"
-            placeholder="Enter your address"
-            value={values.permanentAddress}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.permanentAddress && errors.permanentAddress}
-            required
-          />
-          <TextInput
-            label="State"
-            name="permanentState"
-            type="text"
-            placeholder="Enter your state"
-            value={values.permanentState}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.permanentState && errors.permanentState}
-            required
-          />
-          <TextInput
-            label="District"
-            name="permanentDistrict"
-            type="text"
-            placeholder="Enter your district"
-            value={values.permanentDistrict}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.permanentDistrict && errors.permanentDistrict}
-            required
-          />
-          <TextInput
-            label="Pin"
-            name="permanentPin"
-            type="text"
-            placeholder="Enter your pin"
-            value={values.permanentPin}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.permanentPin && errors.permanentPin}
-            required
-          />
-        </div>
+    <div className="bg-white p-8 rounded-xl shadow-lg">
+      <h2 className="text-2xl font-bold text-gray-800 mb-8 border-b pb-2">
+        Address Details
+      </h2>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        {fields.map(({ label, name }) => (
+          <div key={name} className="flex flex-col">
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              {label}
+            </label>
+            <input
+              type="text"
+              name={name}
+              value={values[name] || ""}
+              onChange={handleChange}
+              onBlur={() => setFieldTouched(name)}
+              className="rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={label}
+            />
+            {touched[name] && errors[name] && (
+              <span className="text-red-500 text-sm mt-1">
+                {errors[name]}
+              </span>
+            )}
+          </div>
+        ))}
       </div>
 
-      {/* Current Address Section */}
-      <div className="mt-8 md:mt-12">
-        <h2 className="text-xl font-semibold mb-6 text-center">
-          Current Address
-        </h2>
-        <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-[200px] md:gap-y-8">
-          <TextInput
-            label="Address"
-            name="currentAddress"
-            type="text"
-            placeholder="Enter your address"
-            value={values.currentAddress}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.currentAddress && errors.currentAddress}
-            required
-          />
-          <TextInput
-            label="State"
-            name="currentState"
-            type="text"
-            placeholder="Enter your state"
-            value={values.currentState}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.currentState && errors.currentState}
-            required
-          />
-          <TextInput
-            label="District"
-            name="currentDistrict"
-            type="text"
-            placeholder="Enter your district"
-            value={values.currentDistrict}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.currentDistrict && errors.currentDistrict}
-            required
-          />
-          <TextInput
-            label="Pin"
-            name="currentPin"
-            type="text"
-            placeholder="Enter your pin"
-            value={values.currentPin}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.currentPin && errors.currentPin}
-            required
-          />
-        </div>
+      <div className="mt-10 flex justify-between">
+        <button
+          type="button"
+          onClick={prevStep}
+          className="px-6 py-2 bg-gray-400 text-white rounded-full shadow hover:bg-gray-500"
+        >
+          Back
+        </button>
+        <button
+          type="button"
+          onClick={nextStep}
+          className="px-6 py-2 bg-blue-600 text-white rounded-full shadow hover:bg-blue-700"
+        >
+          Continue
+        </button>
       </div>
     </div>
   );
 };
 
-export default AdressDetails;
+export default AddressDetails;

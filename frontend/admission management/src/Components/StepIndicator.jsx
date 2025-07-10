@@ -1,83 +1,82 @@
-import React from 'react';
-import { FiCheck, FiUser, FiMapPin, FiBook, FiCamera, FiFileText, FiCheckCircle } from 'react-icons/fi';
+import React from "react";
+import {
+  FiUser,
+  FiMapPin,
+  FiBookOpen,
+  FiFileText,
+  FiCheck,
+} from "react-icons/fi";
 
-const StepIndicator = ({ currentStep, totalSteps }) => {
-  const steps = [
-    { number: 1, label: 'Personal Details', icon: FiUser },
-    { number: 2, label: 'Address', icon: FiMapPin },
-    { number: 3, label: 'Education', icon: FiBook },
-    { number: 4, label: 'Photo & Sign', icon: FiCamera },
-    { number: 5, label: 'Documents', icon: FiFileText },
-    { number: 6, label: 'Confirmation', icon: FiCheckCircle }
-  ];
+const steps = [
+  { label: "Personal Details", icon: <FiUser className="w-5 h-5" /> },
+  { label: "Address Details", icon: <FiMapPin className="w-5 h-5" /> },
+  { label: "Education Details", icon: <FiBookOpen className="w-5 h-5" /> },
+  { label: "Upload PDF", icon: <FiFileText className="w-5 h-5" /> },
+  { label: "Preview", icon: <FiCheck className="w-5 h-5" /> },
+];
 
+const StepIndicator = ({ currentStep }) => {
   return (
-    <div className="step-indicator w-full max-w-4xl mx-auto mb-8">
-      <div className="flex items-center justify-between">
-        {steps.map((step, index) => {
-          const Icon = step.icon;
-          const isActive = step.number === currentStep;
-          const isCompleted = step.number < currentStep;
-          const isLast = index === steps.length - 1;
+    <div className="flex justify-between items-center">
+      {steps.map((step, index) => {
+        const stepNumber = index + 1;
+        const isActive = currentStep === index;
+        const isCompleted = currentStep > index;
 
-          return (
-            <React.Fragment key={step.number}>
-              <div className="flex flex-col items-center">
-                {/* Step Circle */}
-                <div
-                  className={`
-                    relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 border-2
-                    ${isCompleted 
-                      ? 'bg-green-500 border-green-500 text-white shadow-lg' 
-                      : isActive 
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg ring-4 ring-blue-100' 
-                        : 'bg-white border-gray-300 text-gray-400'
-                    }
-                  `}
-                >
-                  {isCompleted ? (
-                    <FiCheck className="w-5 h-5" />
-                  ) : (
-                    <Icon className="w-5 h-5" />
-                  )}
-                </div>
-                
-                {/* Step Label */}
-                <div className="mt-2 text-center">
-                  <div
-                    className={`
-                      text-xs font-medium transition-colors duration-300
-                      ${isActive || isCompleted ? 'text-gray-900' : 'text-gray-500'}
-                    `}
-                  >
-                    {step.label}
-                  </div>
-                  <div
-                    className={`
-                      text-xs transition-colors duration-300
-                      ${isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-400'}
-                    `}
-                  >
-                    Step {step.number}
-                  </div>
-                </div>
+        return (
+          <div key={index} className="flex-1 flex flex-col items-center relative">
+            {/* Step Circle */}
+            <div className="relative">
+              <div
+                className={`w-12 h-12 flex items-center justify-center rounded-full transition-all duration-300 transform ${
+                  isCompleted
+                    ? "bg-white text-green-600 shadow-lg scale-110"
+                    : isActive
+                    ? "bg-white text-orange-600 shadow-lg scale-110"
+                    : "bg-white/20 text-white/60"
+                }`}
+              >
+                {isCompleted ? (
+                  <FiCheck className="w-6 h-6" />
+                ) : (
+                  step.icon
+                )}
               </div>
-
-              {/* Connection Line */}
-              {!isLast && (
-                <div className="flex-1 mx-2 mt-6">
-                  <div
-                    className={`
-                      h-0.5 transition-all duration-300
-                      ${isCompleted ? 'bg-green-500' : 'bg-gray-300'}
-                    `}
-                  />
+              
+              {/* Step Number */}
+              {!isCompleted && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                  <span className="text-xs font-bold text-orange-600">{stepNumber}</span>
                 </div>
               )}
-            </React.Fragment>
-          );
-        })}
-      </div>
+            </div>
+
+            {/* Step Label */}
+            <div className="mt-3 text-center">
+              <span
+                className={`text-sm font-medium transition-all duration-300 ${
+                  isCompleted || isActive 
+                    ? "text-white font-semibold" 
+                    : "text-white/60"
+                }`}
+              >
+                {step.label}
+              </span>
+            </div>
+
+            {/* Connector Line */}
+            {index < steps.length - 1 && (
+              <div className="absolute top-6 left-1/2 w-full h-0.5 bg-white/20">
+                <div 
+                  className={`h-full bg-white transition-all duration-500 ease-out ${
+                    isCompleted ? 'w-full' : 'w-0'
+                  }`}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

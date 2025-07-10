@@ -1,215 +1,168 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
-import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiAlertCircle } from 'react-icons/fi';
-import { signinFailure, signinStart, signinSuccess } from '../redux/user/userSlice.js';
-import TextInput from './formComponents/TextInput';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import { FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiLoader } from "react-icons/fi";
 
-const LoginSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
-  password: Yup.string()
-    .min(8, 'Password must be at least 8 characters')
-    .required('Password is required'),
-});
-
-function Login() {
-  const [showPassword, setShowPassword] = useState(false);
-  const { loading, error } = useSelector((state) => state.user);
+const Login = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [form, setForm] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    if (error) setError(""); // Clear error when user starts typing
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
     try {
-      dispatch(signinStart());
-      
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-      const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-        credentials: 'include',
-      });
+      const res = await axios.post("http://localhost:3000/signin", form);
 
-      const data = await response.json();
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
 
-      if (response.ok && data.success) {
-        dispatch(signinSuccess(data.user));
-        navigate('/admission');
+      if (res.data.role === "admin") {
+        navigate("/admin");
       } else {
-        dispatch(signinFailure(data.message || 'Login failed'));
+        navigate("/dashboard");
       }
-    } catch (error) {
-      dispatch(signinFailure(error.message || 'An error occurred'));
+    } catch (err) {
+      setError(err.response?.data?.msg || "Login failed. Please check your credentials.");
     } finally {
-      setSubmitting(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <div className="flex justify-center">
-            <img 
-              src="/logo.jpg" 
-              alt="College Logo" 
-              className="h-16 w-16 rounded-lg object-cover shadow-lg"
-            />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-orange-50 p-4">
+      <div className="form-card w-full">
+        {/* Logo and Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <span className="text-white font-bold text-2xl">C</span>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Welcome Back
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to your account to continue with your admission
-          </p>
+          <h1 className="heading-xl mb-2">Welcome back</h1>
+          <p className="text-gray-600">Sign in to your account to continue</p>
         </div>
 
-        {/* Form */}
-        <div className="card">
-          <Formik
-            initialValues={{ email: '', password: '' }}
-            validationSchema={LoginSchema}
-            onSubmit={handleSubmit}
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-3">
+              <FiAlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Username Field */}
+          <div>
+            <label htmlFor="username" className="label">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              value={form.username}
+              onChange={handleChange}
+              placeholder="Enter your username"
+              required
+            />
+          </div>
+
+          {/* Password Field */}
+          <div>
+            <label htmlFor="password" className="label">Password</label>
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Forgot Password Link */}
+          <div className="flex items-center justify-end">
+            <Link 
+              to="/forgot-password" 
+              className="text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
+            >
+              Forgot your password?
+            </Link>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="btn btn-primary w-full flex items-center justify-center space-x-2"
           >
-            {({ isSubmitting, values, setFieldValue }) => (
-              <Form className="space-y-6">
-                {/* Error Alert */}
-                {error && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
-                    <FiAlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <h3 className="text-sm font-medium text-red-800">Login Failed</h3>
-                      <p className="text-sm text-red-700 mt-1">{error}</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Email Field */}
-                <TextInput
-                  label="Email Address"
-                  name="email"
-                  type="email"
-                  icon={FiMail}
-                  placeholder="Enter your email"
-                  required
-                  autoComplete="email"
-                />
-
-                {/* Password Field */}
-                <div className="mb-4">
-                  <label className="form-label">
-                    Password <span className="text-red-500">*</span>
-                  </label>
-                  
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FiLock className="h-4 w-4 text-gray-400" />
-                    </div>
-                    
-                    <input
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={values.password}
-                      onChange={(e) => setFieldValue('password', e.target.value)}
-                      className="form-input pl-10 pr-10"
-                      placeholder="Enter your password"
-                      required
-                      autoComplete="current-password"
-                    />
-                    
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <FiEyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                      ) : (
-                        <FiEye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember Me & Forgot Password */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <input
-                      id="remember-me"
-                      name="remember-me"
-                      type="checkbox"
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                      Remember me
-                    </label>
-                  </div>
-
-                  <div className="text-sm">
-                    <a href="#" className="text-blue-600 hover:text-blue-500 font-medium">
-                      Forgot password?
-                    </a>
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting || loading}
-                  className="btn btn-primary w-full inline-flex items-center justify-center"
-                >
-                  {isSubmitting || loading ? (
-                    <>
-                      <svg className="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Signing in...
-                    </>
-                  ) : (
-                    <>
-                      Sign In
-                      <FiArrowRight className="w-4 h-4 ml-2" />
-                    </>
-                  )}
-                </button>
-              </Form>
+            {isLoading ? (
+              <>
+                <FiLoader className="w-5 h-5 animate-spin" />
+                <span>Signing in...</span>
+              </>
+            ) : (
+              <span>Sign In</span>
             )}
-          </Formik>
+          </button>
+
+          {/* Divider */}
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">New to Counsel?</span>
+              </div>
+            </div>
+          </div>
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link 
-                to="/signup" 
-                className="text-blue-600 hover:text-blue-500 font-medium transition-colors"
-              >
-                Sign up here
-              </Link>
-            </p>
+            <Link
+              to="/signup"
+              className="text-orange-600 hover:text-orange-700 font-medium transition-colors"
+            >
+              Create an account
+            </Link>
           </div>
-        </div>
+        </form>
 
-        {/* Additional Info */}
-        <div className="text-center">
-          <p className="text-xs text-gray-500">
-            By signing in, you agree to our{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-500">Terms of Service</a>
-            {' '}and{' '}
-            <a href="#" className="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-gray-500">
+            By signing in, you agree to our{" "}
+            <Link to="/terms" className="text-orange-600 hover:text-orange-700">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link to="/privacy" className="text-orange-600 hover:text-orange-700">
+              Privacy Policy
+            </Link>
           </p>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Login;

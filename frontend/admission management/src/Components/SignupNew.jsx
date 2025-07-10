@@ -71,24 +71,22 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         {/* Logo */}
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">A</span>
+          <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <span className="text-white text-2xl font-bold">C</span>
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-          Create your account
-        </h2>
+        <h2 className="mt-6 text-center heading-xl">Create your account</h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Join thousands of students simplifying their admission process
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="form-container">
+        <div className="form-card w-full">
           {/* Error Alert */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -112,33 +110,34 @@ const Signup = () => {
             {({ isSubmitting, values }) => (
               <Form className="space-y-6">
                 {/* Username Field */}
-                <TextInput
-                  label="Username"
-                  name="username"
-                  type="text"
-                  placeholder="Enter your username"
-                  icon={<FiUser className="w-5 h-5" />}
-                  required
-                />
+                <div>
+                  <label htmlFor="username" className="label">Username</label>
+                  <TextInput
+                    name="username"
+                    type="text"
+                    placeholder="Enter your username"
+                    required
+                  />
+                </div>
 
                 {/* Email Field */}
-                <TextInput
-                  label="Email address"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  icon={<FiMail className="w-5 h-5" />}
-                  required
-                />
+                <div>
+                  <label htmlFor="email" className="label">Email address</label>
+                  <TextInput
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
 
                 {/* Password Field */}
                 <div className="relative">
+                  <label htmlFor="password" className="label">Password</label>
                   <TextInput
-                    label="Password"
                     name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Create a password"
-                    icon={<FiLock className="w-5 h-5" />}
                     required
                   />
                   <button
@@ -156,12 +155,11 @@ const Signup = () => {
 
                 {/* Confirm Password Field */}
                 <div className="relative">
+                  <label htmlFor="confirmPassword" className="label">Confirm Password</label>
                   <TextInput
-                    label="Confirm Password"
                     name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm your password"
-                    icon={<FiLock className="w-5 h-5" />}
                     required
                   />
                   <button
@@ -198,43 +196,44 @@ const Signup = () => {
 
                 {/* Terms Agreement */}
                 <div className="flex items-start">
-                  <input
-                    id="terms"
-                    name="terms"
-                    type="checkbox"
-                    required
-                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-                    I agree to the{' '}
-                    <a href="#" className="text-orange-600 hover:text-orange-500 font-medium">
-                      Terms of Service
-                    </a>{' '}
-                    and{' '}
-                    <a href="#" className="text-orange-600 hover:text-orange-500 font-medium">
-                      Privacy Policy
-                    </a>
-                  </label>
+                  <div className="flex items-center h-5">
+                    <input
+                      id="terms"
+                      name="terms"
+                      type="checkbox"
+                      className="focus:ring-orange-500 h-4 w-4 text-orange-600 border-gray-300 rounded"
+                      required
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label htmlFor="terms" className="text-gray-600">
+                      I agree to the{' '}
+                      <Link to="/terms" className="text-orange-600 hover:text-orange-700">
+                        Terms of Service
+                      </Link>{' '}
+                      and{' '}
+                      <Link to="/privacy" className="text-orange-600 hover:text-orange-700">
+                        Privacy Policy
+                      </Link>
+                    </label>
+                  </div>
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={isSubmitting || loading}
-                  className="btn btn-primary w-full inline-flex items-center justify-center"
+                  className="btn btn-primary w-full flex items-center justify-center space-x-2"
                 >
-                  {isSubmitting || loading ? (
+                  {loading ? (
                     <>
-                      <svg className="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Creating account...
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Creating Account...</span>
                     </>
                   ) : (
                     <>
-                      Create Account
-                      <FiArrowRight className="w-4 h-4 ml-2" />
+                      <span>Create Account</span>
+                      <FiArrowRight className="w-5 h-5" />
                     </>
                   )}
                 </button>
@@ -246,10 +245,7 @@ const Signup = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <Link 
-                to="/login" 
-                className="text-orange-600 hover:text-orange-500 font-medium transition-colors"
-              >
+              <Link to="/signin" className="text-orange-600 hover:text-orange-700 font-medium">
                 Sign in here
               </Link>
             </p>

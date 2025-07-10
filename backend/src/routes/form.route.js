@@ -3,7 +3,7 @@ import FormController from '../controllers/form.controller.js';
 import { uploadAll } from '../config/multer.js';
 import multer from 'multer';
 
-const formRouter = express.formRouter();
+const formRouter = express.Router();
 
 const uploadFields = uploadAll.fields([
   { name: 'photo', maxCount: 1 },
