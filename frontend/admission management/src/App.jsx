@@ -73,7 +73,14 @@ const router = createBrowserRouter([
       { path: "/", element: <Hero /> },
       { path: "/about", element: <About /> },
       { path: "/plan", element: <Plan /> },
-      { path: "/dashboard", element: <Dashboard /> },
+      { 
+        path: "/dashboard", 
+        element: (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        ) 
+      },
       { path: "/signup", element: <Signup /> },
       { path: "/signin", element: <Login /> },
       { path: "/admission", element: <MultiStepForm /> },
