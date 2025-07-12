@@ -17,6 +17,7 @@ const Confirmation = () => {
           <p><strong>Email:</strong> {values.emailId}</p>
           <p><strong>JEE Roll No:</strong> {values.jeeRollNo}</p>
           <p><strong>JEE Rank:</strong> {values.jeeRank}</p>
+          <p><strong>Branch:</strong> {values.branch}</p>
         </div>
 
         <hr />

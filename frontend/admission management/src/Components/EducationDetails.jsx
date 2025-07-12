@@ -14,10 +14,53 @@ const Input = ({ label, name, placeholder, type = "text" }) => (
   </div>
 );
 
+const Select = ({ label, name, options }) => (
+  <div className="w-full md:w-1/2 px-2 mb-6">
+    <label className="block text-sm font-medium text-gray-700 mb-1">{label} *</label>
+    <Field
+      as="select"
+      name={name}
+      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400"
+    >
+      <option value="">Select {label}</option>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </Field>
+    <ErrorMessage name={name} component="div" className="text-red-500 text-sm mt-1" />
+  </div>
+);
+
 const EducationDetails = ({ nextStep }) => {
+  const branchOptions = [
+    { value: "computer-science", label: "Computer Science Engineering" },
+    { value: "mechanical", label: "Mechanical Engineering" },
+    { value: "electrical", label: "Electrical Engineering" },
+    { value: "electronics", label: "Electronics & Communication Engineering" },
+    { value: "civil", label: "Civil Engineering" },
+    { value: "chemical", label: "Chemical Engineering" },
+    { value: "biotechnology", label: "Biotechnology Engineering" },
+    { value: "information-technology", label: "Information Technology" },
+    { value: "aerospace", label: "Aerospace Engineering" },
+    { value: "automobile", label: "Automobile Engineering" },
+    { value: "agricultural", label: "Agricultural Engineering" },
+    { value: "textile", label: "Textile Engineering" },
+    { value: "metallurgical", label: "Metallurgical Engineering" },
+    { value: "mining", label: "Mining Engineering" },
+    { value: "petroleum", label: "Petroleum Engineering" },
+    { value: "other", label: "Other" }
+  ];
+
   return (
     <div className="">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">Class 10</h2>
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">Branch Preference</h2>
+      <div className="flex flex-wrap">
+        <Select name="branch" label="Branch" options={branchOptions} />
+      </div>
+
+      <h2 className="text-xl font-semibold text-gray-800 mb-4 mt-8">Class 10</h2>
       <div className="flex flex-wrap">
         <Input name="class10School" label="School" placeholder="Enter your school name" />
         <Input name="class10Board" label="Board" placeholder="Pick your school board" />

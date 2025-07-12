@@ -29,6 +29,7 @@ const initialValues = {
   emailId: "",
   jeeRollNo: "",
   jeeRank: "",
+  branch: "",
 
   permanentAddress: "",
   permanentState: "",
@@ -69,6 +70,7 @@ const validationSchema = Yup.object({
     .typeError("Roll number must be a number")
     .required("JEE Roll No is required"),
   jeeRank: Yup.number().typeError("JEE Rank must be a number").required("JEE Rank is required"),
+  branch: Yup.string().required("Branch is required"),
   class10Percentage: Yup.number()
     .typeError("Percentage must be a number")
     .min(0, "Percentage cannot be less than 0")

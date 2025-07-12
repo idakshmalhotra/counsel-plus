@@ -9,6 +9,7 @@ const initialState = {
     dateOfBirth: "",
     jeeRollNo: "",
     jeeRank: "",
+    branch: "",
     phone: "",
     fathersPhone: "",
     emailId: "",

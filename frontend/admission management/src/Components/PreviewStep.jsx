@@ -11,6 +11,7 @@ const PreviewStep = ({ values, prevStep }) => {
         <p><strong>Phone:</strong> {values.phone}</p>
         <p><strong>Email:</strong> {values.emailId}</p>
         <p><strong>JEE Rank:</strong> {values.jeeRank}</p>
+        <p><strong>Branch:</strong> {values.branch}</p>
 
         {/* ...Add other fields here as needed... */}
 

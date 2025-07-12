@@ -90,6 +90,7 @@ const AdminDashboard = () => {
                 <th className="p-2 border">Email</th>
                 <th className="p-2 border">Phone</th>
                 <th className="p-2 border">JEE Rank</th>
+                <th className="p-2 border">Branch</th>
                 <th className="p-2 border">DOB</th>
                 <th className="p-2 border">Category</th>
               </tr>
@@ -102,13 +103,14 @@ const AdminDashboard = () => {
                   <td className="p-2 border">{student.emailId}</td>
                   <td className="p-2 border">{student.phone}</td>
                   <td className="p-2 border">{student.jeeRank}</td>
+                  <td className="p-2 border">{student.branch}</td>
                   <td className="p-2 border">{student.dateOfBirth?.slice(0, 10)}</td>
                   <td className="p-2 border">{student.category}</td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="text-center p-4">
+                  <td colSpan="8" className="text-center p-4">
                     No data found.
                   </td>
                 </tr>
