@@ -92,7 +92,6 @@ const AdminDashboard = () => {
                 <th className="p-2 border">JEE Rank</th>
                 <th className="p-2 border">DOB</th>
                 <th className="p-2 border">Category</th>
-                <th className="p-2 border">PDF</th>
               </tr>
             </thead>
             <tbody>
@@ -105,21 +104,11 @@ const AdminDashboard = () => {
                   <td className="p-2 border">{student.jeeRank}</td>
                   <td className="p-2 border">{student.dateOfBirth?.slice(0, 10)}</td>
                   <td className="p-2 border">{student.category}</td>
-                  <td className="p-2 border">
-                    <a
-                      href={student.pdfUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 underline"
-                    >
-                      View PDF
-                    </a>
-                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="text-center p-4">
+                  <td colSpan="7" className="text-center p-4">
                     No data found.
                   </td>
                 </tr>

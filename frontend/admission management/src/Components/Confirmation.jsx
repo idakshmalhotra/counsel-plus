@@ -39,11 +39,7 @@ const Confirmation = () => {
           </ul>
         </div>
 
-        {values.additionalPdf && (
-          <div>
-            <p><strong>Additional PDF:</strong> {values.additionalPdf.name}</p>
-          </div>
-        )}
+
 
         <div className="mt-6">
           <p className="text-sm text-gray-600">Please verify all details before submitting.</p>

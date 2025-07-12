@@ -11,7 +11,6 @@ const steps = [
   { label: "Personal Details", icon: <FiUser className="w-5 h-5" /> },
   { label: "Address Details", icon: <FiMapPin className="w-5 h-5" /> },
   { label: "Education Details", icon: <FiBookOpen className="w-5 h-5" /> },
-  { label: "Upload PDF", icon: <FiFileText className="w-5 h-5" /> },
   { label: "Preview", icon: <FiCheck className="w-5 h-5" /> },
 ];
 

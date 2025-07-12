@@ -14,20 +14,7 @@ const PreviewStep = ({ values, prevStep }) => {
 
         {/* ...Add other fields here as needed... */}
 
-        {values.pdfFile && values.pdfFile instanceof File ? (
-          <div className="mt-4">
-            <p className="font-medium">Uploaded PDF Preview:</p>
-            <iframe
-              src={URL.createObjectURL(values.pdfFile)}
-              title="Uploaded PDF"
-              width="100%"
-              height="400px"
-              className="border border-gray-300 rounded"
-            />
-          </div>
-        ) : (
-          <p className="text-red-500 mt-4">No PDF file selected</p>
-        )}
+
       </div>
     </div>
   );

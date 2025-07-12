@@ -7,7 +7,7 @@ import { FiArrowLeft, FiArrowRight, FiCheck, FiLoader } from "react-icons/fi";
 import PersonalDetails from "./PersonalDetails";
 import AddressDetails from "./AddressDetails";
 import EducationDetails from "./EducationDetails";
-import PdfUpload from "./PdfUpload";
+
 import StepIndicator from "./StepIndicator";
 import PreviewStep from "./PreviewStep";
 
@@ -15,7 +15,6 @@ const steps = [
   { label: "Personal Details", component: PersonalDetails },
   { label: "Address Details", component: AddressDetails },
   { label: "Education Details", component: EducationDetails },
-  { label: "Upload PDF", component: PdfUpload },
   { label: "Preview", component: PreviewStep },
 ];
 
@@ -57,7 +56,8 @@ const initialValues = {
   class12Subject5: "",
   class12Subject5Marks: "",
 
-  pdfFile: null,
+  
+  
 };
 
 const validationSchema = Yup.object({
@@ -107,9 +107,7 @@ const validationSchema = Yup.object({
     .typeError("Marks must be a number")
     .min(0, "Marks cannot be less than 0")
     .max(100, "Marks cannot exceed 100"),
-  pdfFile: Yup.mixed()
-    .required("PDF is required")
-    .test("fileType", "Only PDF allowed", (value) => value && value.type === "application/pdf"),
+  
 });
 
 const MultiStepComponent = () => {
@@ -124,11 +122,7 @@ const MultiStepComponent = () => {
 
       const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => {
-        if (key === "pdfFile" && value instanceof File) {
-          formData.append("pdf", value); // Backend expects key 'pdf'
-        } else {
-          formData.append(key, value);
-        }
+        formData.append(key, value);
       });
       console.log("📦 Form data to submit:");
 Object.entries(values).forEach(([key, val]) => {
@@ -136,8 +130,12 @@ Object.entries(values).forEach(([key, val]) => {
 });
 
 
+      const token = localStorage.getItem("token");
       const res = await axios.post("http://localhost:3000/api/form/submit-form", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`
+        },
       });
 
       alert("Form submitted successfully");
