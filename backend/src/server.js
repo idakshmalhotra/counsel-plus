@@ -19,25 +19,19 @@ const JWT_SECRET = process.env.JWT_SECRET || "1234567890";
 // ✅ File Upload
 app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
 
-// ✅ CORS Configuration
+// ✅ CORS Configuration - Allow all origins for development
 const allowedOrigins = [
   'https://plus.d29w8hj3me53fe.amplifyapp.com',
+  'https://plus.d3ounre046g9mh.amplifyapp.com',
+  'https://counsel.d1hhfzrszv4vvo.amplifyapp.com',
   'http://localhost:5173',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'https://www.dakshmalhotra.xyz'
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: true, // Allow all origins temporarily
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -95,7 +89,6 @@ app.post("/signup", async (req, res) => {
   try {
     const existingUser = await AuthUser.findOne({ $or: [{ username }, { email }] });
     if (existingUser) return res.status(409).json({ message: "Username or email exists" });
-
     const hashedPassword = bcrypt.hashSync(password, 10);
     await AuthUser.create({ username, email, password: hashedPassword });
 
