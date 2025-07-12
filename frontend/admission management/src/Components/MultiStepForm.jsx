@@ -123,20 +123,15 @@ const MultiStepComponent = () => {
     try {
       console.log("Submitting form with values:", values);
 
-      const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
       console.log("📦 Form data to submit:");
-Object.entries(values).forEach(([key, val]) => {
-  console.log(`${key}:`, val);
-});
-
+      Object.entries(values).forEach(([key, val]) => {
+        console.log(`${key}:`, val);
+      });
 
       const token = localStorage.getItem("token");
-      const res = await axios.post(API_ENDPOINTS.SUBMIT_FORM, formData, {
+      const res = await axios.post(API_ENDPOINTS.SUBMIT_FORM, values, {
         headers: { 
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
       });
@@ -147,7 +142,16 @@ Object.entries(values).forEach(([key, val]) => {
     } catch (err) {
       console.error("Form submit error:", err.response?.data || err.message);
       console.log("Full error:", err);
-      alert("Failed to submit form.");
+      
+      // Show more specific error messages
+      if (err.response?.data?.message) {
+        alert(`Form submission failed: ${err.response.data.message}`);
+      } else if (err.response?.data?.errors) {
+        const errorMessages = err.response.data.errors.map(e => `${e.field}: ${e.message}`).join('\n');
+        alert(`Validation errors:\n${errorMessages}`);
+      } else {
+        alert("Failed to submit form. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }

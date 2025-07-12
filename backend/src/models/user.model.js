@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
+  // User ID from JWT token
+  userId: { type: String, required: true, unique: true },
+  
   // Personal Details
   name: { type: String, required: true, maxlength: 50 },
   fathersName: { type: String, required: true, maxlength: 50 },

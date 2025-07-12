@@ -118,14 +118,21 @@ app.get("/api/validate-token", authMiddleware, (req, res) => {
 });
 
 // ✅ Form submission
-app.post("/api/form/submit-form",authMiddleware, async (req, res) => {
+app.post("/api/form/submit-form", authMiddleware, async (req, res) => {
   try {
+    console.log("Received form data:", req.body);
+    console.log("User ID from token:", req.user.id);
+
+    // Handle JSON data
     const formData = {
       ...req.body,
+      userId: req.user.id, // Add user ID from JWT token
     };
 
     // Convert dates and numbers
-    if (formData.dateOfBirth) formData.dateOfBirth = new Date(formData.dateOfBirth);
+    if (formData.dateOfBirth) {
+      formData.dateOfBirth = new Date(formData.dateOfBirth);
+    }
 
     const numberFields = [
       "jeeRank", "class10Percentage", "class10TotalMarks",
@@ -133,20 +140,58 @@ app.post("/api/form/submit-form",authMiddleware, async (req, res) => {
       "class12PhysicsMarks", "class12ChemistryMarks", "class12MathMarks",
       "class12Subject4Marks", "class12Subject5Marks",
     ];
+    
     numberFields.forEach((key) => {
-      if (formData[key]) formData[key] = Number(formData[key]);
+      if (formData[key] && formData[key] !== "") {
+        formData[key] = Number(formData[key]);
+      }
     });
 
     const trimFields = ["gender", "category", "phone", "fathersPhone", "branch"];
     trimFields.forEach((key) => {
-      if (formData[key]) formData[key] = formData[key].trim();
+      if (formData[key]) {
+        formData[key] = formData[key].trim();
+      }
     });
 
+    // Check if user already has a form submission
+    const existingForm = await User.findOne({ userId: req.user.id });
+    if (existingForm) {
+      return res.status(409).json({ 
+        message: "Form already submitted", 
+        id: existingForm._id 
+      });
+    }
+
+    console.log("Processed form data:", formData);
     const savedUser = await User.create(formData);
-    res.status(201).json({ success: true, message: "Form submitted", id: savedUser._id });
+    
+    console.log("Form saved successfully:", savedUser._id);
+    res.status(201).json({ 
+      success: true, 
+      message: "Form submitted successfully", 
+      id: savedUser._id 
+    });
   } catch (error) {
-    console.error("Form error:", error);
-    res.status(500).json({ message: "Failed to submit form", error: error.message });
+    console.error("Form submission error:", error);
+    
+    // Handle validation errors specifically
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.keys(error.errors).map(key => ({
+        field: key,
+        message: error.errors[key].message
+      }));
+      
+      return res.status(400).json({ 
+        message: "Validation failed", 
+        errors: validationErrors 
+      });
+    }
+    
+    res.status(500).json({ 
+      message: "Failed to submit form", 
+      error: error.message 
+    });
   }
 });
 
