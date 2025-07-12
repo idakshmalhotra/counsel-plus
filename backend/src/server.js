@@ -19,11 +19,11 @@ const JWT_SECRET = process.env.JWT_SECRET || "1234567890";
 // ✅ File Upload
 app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
 
-// ✅ CORS
+// ✅ CORS Configuration
 const allowedOrigins = [
-  "http://localhost:5173", // Development
-  "http://counsel-app-plus.s3-website.eu-north-1.amazonaws.com", // Production
-  "https://counsel-app-plus.s3-website.eu-north-1.amazonaws.com" // Production with HTTPS
+  'https://plus.d29w8hj3me53fe.amplifyapp.com',
+  'http://localhost:5173',
+  'http://localhost:3000'
 ];
 
 app.use(
@@ -39,6 +39,8 @@ app.use(
       }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   })
 );
 
@@ -70,7 +72,20 @@ cloudinary.config({
 
 // ✅ Routes
 app.get("/", (req, res) => {
-  res.json("Server is live");
+  res.json({ 
+    message: "Server is live", 
+    timestamp: new Date().toISOString(),
+    status: "healthy"
+  });
+});
+
+// ✅ Health check for mobile
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 // ✅ Signup
