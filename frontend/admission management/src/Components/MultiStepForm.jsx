@@ -10,6 +10,7 @@ import EducationDetails from "./EducationDetails";
 
 import StepIndicator from "./StepIndicator";
 import PreviewStep from "./PreviewStep";
+import { API_ENDPOINTS } from "../config/api.js";
 
 const steps = [
   { label: "Personal Details", component: PersonalDetails },
@@ -133,7 +134,7 @@ Object.entries(values).forEach(([key, val]) => {
 
 
       const token = localStorage.getItem("token");
-      const res = await axios.post("http://localhost:3000/api/form/submit-form", formData, {
+      const res = await axios.post(API_ENDPOINTS.SUBMIT_FORM, formData, {
         headers: { 
           "Content-Type": "multipart/form-data",
           "Authorization": `Bearer ${token}`

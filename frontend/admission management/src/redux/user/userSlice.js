@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 export const loginUser = createAsyncThunk("user/login", async (formData) => {
-  const response = await axios.post("http://localhost:3000/signin", formData);
+  const response = await axios.post(API_ENDPOINTS.SIGNIN, formData);
   return response.data;
 });
 

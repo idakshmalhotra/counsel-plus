@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiLoader, FiCheckCircle } from "react-icons/fi";
+import { API_ENDPOINTS } from "../config/api.js";
 
 function Signup() {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ function Signup() {
     setIsLoading(true);
     try {
       const { confirmPassword, ...signupData } = formData;
-      await axios.post("http://localhost:3000/signup", signupData);
+      await axios.post(API_ENDPOINTS.SIGNUP, signupData);
       
       setSuccess(true);
       setTimeout(() => {

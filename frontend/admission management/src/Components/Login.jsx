@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiLoader } from "react-icons/fi";
+import { API_ENDPOINTS } from "../config/api.js";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:3000/signin", form);
+      const res = await axios.post(API_ENDPOINTS.SIGNIN, form);
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);

@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
   emailId: { type: String, required: true, match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
   jeeRollNo: { type: String, required: true, match: /^[0-9]+$/ },
   jeeRank: { type: Number, required: true, min: 1 },
+  branch: { type: String, required: true, enum: ['computer-science', 'mechanical', 'electrical', 'electronics', 'civil', 'chemical', 'biotechnology', 'information-technology', 'aerospace', 'automobile', 'agricultural', 'textile', 'metallurgical', 'mining', 'petroleum', 'other'] },
 
   // Address Details
   permanentAddress: { type: String, required: true, maxlength: 255 },
@@ -40,10 +41,6 @@ const userSchema = new mongoose.Schema({
   class12Subject4Marks: { type: Number, required: true, min: 0, max: 100 },
   class12Subject5: { type: String, required: true, maxlength: 255 },
   class12Subject5Marks: { type: Number, required: true, min: 0, max: 100 },
-
-  // Photo & Signature URLs (Cloudinary)
-  pdfUrl: { type: String, required: false },
-  
 
   // Document URLs (Cloudinary)
  

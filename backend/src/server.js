@@ -20,9 +20,24 @@ const JWT_SECRET = process.env.JWT_SECRET || "1234567890";
 app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
 
 // ✅ CORS
+const allowedOrigins = [
+  "http://localhost:5173", // Development
+  "http://counsel-app-plus.s3-website.eu-north-1.amazonaws.com", // Production
+  "https://counsel-app-plus.s3-website.eu-north-1.amazonaws.com" // Production with HTTPS
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );
@@ -61,7 +76,7 @@ app.get("/", (req, res) => {
 // ✅ Signup
 app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
-
+``
   try {
     const existingUser = await AuthUser.findOne({ $or: [{ username }, { email }] });
     if (existingUser) return res.status(409).json({ message: "Username or email exists" });
@@ -102,20 +117,11 @@ app.get("/api/validate-token", authMiddleware, (req, res) => {
   res.status(200).json({ valid: true, userId: req.user.id });
 });
 
-// ✅ Form submission with Cloudinary PDF upload
-app.post("/api/form/submit-form", async (req, res) => {
+// ✅ Form submission
+app.post("/api/form/submit-form",authMiddleware, async (req, res) => {
   try {
-    const { pdf } = req.files;
-    if (!pdf) return res.status(400).json({ message: "PDF is required" });
-
-    const uploadResult = await cloudinary.uploader.upload(pdf.tempFilePath, {
-      folder: "admission-pdfs",
-      resource_type: "raw",
-    });
-
     const formData = {
       ...req.body,
-      pdfUrl: uploadResult.secure_url,
     };
 
     // Convert dates and numbers
@@ -131,7 +137,7 @@ app.post("/api/form/submit-form", async (req, res) => {
       if (formData[key]) formData[key] = Number(formData[key]);
     });
 
-    const trimFields = ["gender", "category", "phone", "fathersPhone"];
+    const trimFields = ["gender", "category", "phone", "fathersPhone", "branch"];
     trimFields.forEach((key) => {
       if (formData[key]) formData[key] = formData[key].trim();
     });

@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiAlertCircle } from 'react-icons/fi';
 import { signinSuccess } from "../redux/user/userSlice.js";
 import TextInput from './formComponents/TextInput';
+import { API_ENDPOINTS } from "../config/api.js";
 
 const SignupSchema = Yup.object().shape({
   username: Yup.string()
@@ -40,8 +41,7 @@ const Signup = () => {
       setLoading(true);
       setError('');
       
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+      const response = await fetch(API_ENDPOINTS.AUTH_SIGNUP, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

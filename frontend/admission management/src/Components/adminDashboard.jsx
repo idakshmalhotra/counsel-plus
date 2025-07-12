@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
+import { API_ENDPOINTS } from "../config/api.js";
 
 const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
@@ -15,7 +16,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem("token");
 
-      const validate = await axios.get("http://localhost:3000/api/validate-token", {
+      const validate = await axios.get(API_ENDPOINTS.VALIDATE_TOKEN, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
@@ -24,7 +25,7 @@ const AdminDashboard = () => {
 
       const basicAuth = btoa("admin:admin123");
 
-      const res = await axios.get("http://localhost:3000/api/admin/all-submissions", {
+      const res = await axios.get(API_ENDPOINTS.ALL_SUBMISSIONS, {
         headers: {
           Authorization: `Basic ${basicAuth}`,
         },
