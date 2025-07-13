@@ -23,6 +23,25 @@ const PersonalDetails = ({ nextStep }) => {
     localStorage.setItem("counselingAdmissionFormData", JSON.stringify(values));
   }, [values]);
 
+  const branchOptions = [
+    { value: "computer-science", label: "Computer Science Engineering" },
+    { value: "mechanical", label: "Mechanical Engineering" },
+    { value: "electrical", label: "Electrical Engineering" },
+    { value: "electronics", label: "Electronics & Communication Engineering" },
+    { value: "civil", label: "Civil Engineering" },
+    { value: "chemical", label: "Chemical Engineering" },
+    { value: "biotechnology", label: "Biotechnology Engineering" },
+    { value: "information-technology", label: "Information Technology" },
+    { value: "aerospace", label: "Aerospace Engineering" },
+    { value: "automobile", label: "Automobile Engineering" },
+    { value: "agricultural", label: "Agricultural Engineering" },
+    { value: "textile", label: "Textile Engineering" },
+    { value: "metallurgical", label: "Metallurgical Engineering" },
+    { value: "mining", label: "Mining Engineering" },
+    { value: "petroleum", label: "Petroleum Engineering" },
+    { value: "other", label: "Other" }
+  ];
+
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-800 mb-6">Personal Details</h2>
@@ -111,7 +130,7 @@ const PersonalDetails = ({ nextStep }) => {
             onChange={handleChange}
             onBlur={() => setFieldTouched("phone")}
             className="mt-1 block w-full p-2 border rounded-md"
-            placeholder="Enter your phone number"
+            placeholder="Enter your phone number (10 digits starting with 6-9)"
           />
           {touched.phone && errors.phone && <div className="text-red-500 text-sm">{errors.phone}</div>}
         </div>
@@ -124,9 +143,23 @@ const PersonalDetails = ({ nextStep }) => {
             onChange={handleChange}
             onBlur={() => setFieldTouched("fathersPhone")}
             className="mt-1 block w-full p-2 border rounded-md"
-            placeholder="Enter father's phone number"
+            placeholder="Enter father's phone number (10 digits starting with 6-9)"
           />
           {touched.fathersPhone && errors.fathersPhone && <div className="text-red-500 text-sm">{errors.fathersPhone}</div>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Father's Email</label>
+          <input
+            name="fathersEmail"
+            type="email"
+            value={values.fathersEmail}
+            onChange={handleChange}
+            onBlur={() => setFieldTouched("fathersEmail")}
+            className="mt-1 block w-full p-2 border rounded-md"
+            placeholder="Enter father's email address"
+          />
+          {touched.fathersEmail && errors.fathersEmail && <div className="text-red-500 text-sm">{errors.fathersEmail}</div>}
         </div>
 
         <div>
@@ -147,7 +180,7 @@ const PersonalDetails = ({ nextStep }) => {
           <label className="block text-sm font-medium text-gray-700">JEE Roll No</label>
           <input
             name="jeeRollNo"
-            type="number"
+            type="text"
             value={values.jeeRollNo}
             onChange={handleChange}
             onBlur={() => setFieldTouched("jeeRollNo")}
@@ -169,6 +202,25 @@ const PersonalDetails = ({ nextStep }) => {
             placeholder="Enter your JEE rank"
           />
           {touched.jeeRank && errors.jeeRank && <div className="text-red-500 text-sm">{errors.jeeRank}</div>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Branch Preference</label>
+          <select
+            name="branch"
+            value={values.branch}
+            onChange={handleChange}
+            onBlur={() => setFieldTouched("branch")}
+            className="mt-1 block w-full p-2 border rounded-md"
+          >
+            <option value="">Select Branch</option>
+            {branchOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {touched.branch && errors.branch && <div className="text-red-500 text-sm">{errors.branch}</div>}
         </div>
       </div>
 

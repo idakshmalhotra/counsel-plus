@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://13.62.48.182:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://www.dakshmalhotra.xyz';
 
 export const API_ENDPOINTS = {
   // Auth endpoints
@@ -12,9 +12,6 @@ export const API_ENDPOINTS = {
   
   // Admin endpoints
   ALL_SUBMISSIONS: `${API_BASE_URL}/api/admin/all-submissions`,
-  
-  // Auth API endpoints (for SignupNew component)
-  AUTH_SIGNUP: `${API_BASE_URL}/api/auth/signup`,
 };
 
 export default API_BASE_URL; 

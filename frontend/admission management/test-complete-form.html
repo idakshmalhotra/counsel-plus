@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Form Test</title>
+</head>
+<body>
+    <h1>Complete Form Submission Test</h1>
+    
+    <div>
+        <h2>1. Sign In</h2>
+        <input type="text" id="username" placeholder="Username" value="testuser">
+        <input type="password" id="password" placeholder="Password" value="test123">
+        <button onclick="signIn()">Sign In</button>
+        <div id="signin-result"></div>
+    </div>
+
+    <div>
+        <h2>2. Test Complete Form Submission</h2>
+        <button onclick="testCompleteForm()">Submit Complete Form</button>
+        <div id="form-result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://www.dakshmalhotra.xyz';
+
+        async function signIn() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/signin`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                document.getElementById('signin-result').innerHTML = `
+                    <p>Status: ${response.status}</p>
+                    <p>Response: ${JSON.stringify(data, null, 2)}</p>
+                `;
+                
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('role', data.role);
+                    console.log('Token saved:', data.token);
+                }
+            } catch (error) {
+                document.getElementById('signin-result').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testCompleteForm() {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                document.getElementById('form-result').innerHTML = '<p>No token found. Please sign in first.</p>';
+                return;
+            }
+
+            const completeFormData = {
+                // Personal Information
+                name: "Test User",
+                gender: "male", // lowercase enum value
+                dateOfBirth: "2000-01-01",
+                category: "general", // lowercase enum value
+                fathersName: "Test Father",
+                fathersPhone: "9876543210", // Must start with 6-9 and be 10 digits
+                phone: "9876543210", // Must start with 6-9 and be 10 digits
+                emailId: "test@example.com",
+                
+                // JEE Information
+                jeeRollNo: "12345", // String format
+                jeeRank: 50000,
+                branch: "computer-science", // Exact enum value
+                
+                // Address Information
+                permanentAddress: "123 Test Street",
+                permanentState: "Delhi",
+                permanentDistrict: "New Delhi",
+                permanentPin: "110001", // 6 digits
+                currentAddress: "123 Test Street",
+                currentState: "Delhi",
+                currentDistrict: "New Delhi",
+                currentPin: "110001", // 6 digits
+                
+                // Class 10 Information
+                class10School: "Test School",
+                class10Board: "CBSE",
+                class10Percentage: 85,
+                class10TotalMarks: 425,
+                
+                // Class 12 Information
+                class12School: "Test School",
+                class12Board: "CBSE",
+                class12Percentage: 80,
+                class12TotalMarks: 400,
+                class12PCMPercentage: 75,
+                class12PhysicsMarks: 85,
+                class12ChemistryMarks: 80,
+                class12MathMarks: 85,
+                class12Subject4: "English",
+                class12Subject4Marks: 90,
+                class12Subject5: "Computer Science",
+                class12Subject5Marks: 95
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/form/submit-form`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(completeFormData)
+                });
+                
+                const data = await response.json();
+                document.getElementById('form-result').innerHTML = `
+                    <p>Status: ${response.status}</p>
+                    <p>Response: ${JSON.stringify(data, null, 2)}</p>
+                `;
+            } catch (error) {
+                document.getElementById('form-result').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 

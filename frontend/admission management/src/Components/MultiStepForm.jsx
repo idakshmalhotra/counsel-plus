@@ -27,6 +27,7 @@ const initialValues = {
   dateOfBirth: "",
   phone: "",
   fathersPhone: "",
+  fathersEmail: "",
   emailId: "",
   jeeRollNo: "",
   jeeRank: "",
@@ -63,54 +64,98 @@ const initialValues = {
 };
 
 const validationSchema = Yup.object({
-  name: Yup.string().required("Name is required"),
-  gender: Yup.string().required("Gender is required"),
-  phone: Yup.string().required("Phone is required"),
+  // Personal Details
+  name: Yup.string().required("Name is required").max(50, "Name cannot exceed 50 characters"),
+  fathersName: Yup.string().required("Father's name is required").max(50, "Father's name cannot exceed 50 characters"),
+  gender: Yup.string().required("Gender is required").oneOf(['male', 'female', 'other'], "Please select a valid gender"),
+  category: Yup.string().required("Category is required").oneOf(['general', 'sc', 'st', 'obc', 'other'], "Please select a valid category"),
+  dateOfBirth: Yup.date().required("Date of birth is required"),
+  phone: Yup.string()
+    .required("Phone number is required")
+    .matches(/^[6-9]\d{9}$/, "Phone number must be 10 digits starting with 6-9"),
+  fathersPhone: Yup.string()
+    .required("Father's phone number is required")
+    .matches(/^[6-9]\d{9}$/, "Phone number must be 10 digits starting with 6-9"),
+  fathersEmail: Yup.string().email("Invalid email format").required("Father's email is required"),
   emailId: Yup.string().email("Invalid email").required("Email is required"),
-  jeeRollNo: Yup.number()
-    .typeError("Roll number must be a number")
-    .required("JEE Roll No is required"),
-  jeeRank: Yup.number().typeError("JEE Rank must be a number").required("JEE Rank is required"),
+  jeeRollNo: Yup.string()
+    .required("JEE Roll No is required")
+    .matches(/^[0-9]+$/, "JEE Roll No must contain only numbers"),
+  jeeRank: Yup.number()
+    .typeError("JEE Rank must be a number")
+    .required("JEE Rank is required")
+    .min(1, "JEE Rank must be at least 1"),
   branch: Yup.string().required("Branch is required"),
+
+  // Address Details
+  permanentAddress: Yup.string().required("Permanent address is required").max(255, "Address cannot exceed 255 characters"),
+  permanentState: Yup.string().required("Permanent state is required").max(100, "State name cannot exceed 100 characters"),
+  permanentDistrict: Yup.string().required("Permanent district is required").max(100, "District name cannot exceed 100 characters"),
+  permanentPin: Yup.string()
+    .required("Permanent PIN is required")
+    .matches(/^\d{6}$/, "PIN must be exactly 6 digits"),
+  currentAddress: Yup.string().required("Current address is required").max(255, "Address cannot exceed 255 characters"),
+  currentState: Yup.string().required("Current state is required").max(100, "State name cannot exceed 100 characters"),
+  currentDistrict: Yup.string().required("Current district is required").max(100, "District name cannot exceed 100 characters"),
+  currentPin: Yup.string()
+    .required("Current PIN is required")
+    .matches(/^\d{6}$/, "PIN must be exactly 6 digits"),
+
+  // Education Details
+  class10School: Yup.string().required("Class 10 school is required").max(255, "School name cannot exceed 255 characters"),
+  class10Board: Yup.string().required("Class 10 board is required"),
   class10Percentage: Yup.number()
-    .typeError("Percentage must be a number")
+    .typeError("Class 10 percentage must be a number")
+    .required("Class 10 percentage is required")
     .min(0, "Percentage cannot be less than 0")
     .max(100, "Percentage cannot exceed 100"),
   class10TotalMarks: Yup.number()
-    .typeError("Total marks must be a number")
-    .max(500, "Total marks cannot exceed 500"),
+    .typeError("Class 10 total marks must be a number")
+    .required("Class 10 total marks is required")
+    .min(0, "Total marks cannot be less than 0"),
+  class12School: Yup.string().required("Class 12 school is required").max(255, "School name cannot exceed 255 characters"),
+  class12Board: Yup.string().required("Class 12 board is required"),
   class12Percentage: Yup.number()
-    .typeError("Percentage must be a number")
+    .typeError("Class 12 percentage must be a number")
+    .required("Class 12 percentage is required")
     .min(0, "Percentage cannot be less than 0")
     .max(100, "Percentage cannot exceed 100"),
   class12TotalMarks: Yup.number()
-    .typeError("Total marks must be a number")
-    .max(500, "Total marks cannot exceed 500"),
+    .typeError("Class 12 total marks must be a number")
+    .required("Class 12 total marks is required")
+    .min(0, "Total marks cannot be less than 0"),
   class12PCMPercentage: Yup.number()
-    .typeError("PCM Percentage must be a number")
-    .min(0, "PCM Percentage cannot be less than 0")
-    .max(100, "PCM Percentage cannot exceed 100"),
+    .typeError("PCM percentage must be a number")
+    .required("PCM percentage is required")
+    .min(0, "PCM percentage cannot be less than 0")
+    .max(100, "PCM percentage cannot exceed 100"),
   class12PhysicsMarks: Yup.number()
-    .typeError("Marks must be a number")
-    .min(0, "Marks cannot be less than 0")
-    .max(100, "Marks cannot exceed 100"),
+    .typeError("Physics marks must be a number")
+    .required("Physics marks is required")
+    .min(0, "Physics marks cannot be less than 0")
+    .max(100, "Physics marks cannot exceed 100"),
   class12ChemistryMarks: Yup.number()
-    .typeError("Marks must be a number")
-    .min(0, "Marks cannot be less than 0")
-    .max(100, "Marks cannot exceed 100"),
+    .typeError("Chemistry marks must be a number")
+    .required("Chemistry marks is required")
+    .min(0, "Chemistry marks cannot be less than 0")
+    .max(100, "Chemistry marks cannot exceed 100"),
   class12MathMarks: Yup.number()
-    .typeError("Marks must be a number")
-    .min(0, "Marks cannot be less than 0")
-    .max(100, "Marks cannot exceed 100"),
+    .typeError("Mathematics marks must be a number")
+    .required("Mathematics marks is required")
+    .min(0, "Mathematics marks cannot be less than 0")
+    .max(100, "Mathematics marks cannot exceed 100"),
+  class12Subject4: Yup.string().required("Subject 4 is required").max(255, "Subject name cannot exceed 255 characters"),
   class12Subject4Marks: Yup.number()
-    .typeError("Marks must be a number")
-    .min(0, "Marks cannot be less than 0")
-    .max(100, "Marks cannot exceed 100"),
+    .typeError("Subject 4 marks must be a number")
+    .required("Subject 4 marks is required")
+    .min(0, "Subject 4 marks cannot be less than 0")
+    .max(100, "Subject 4 marks cannot exceed 100"),
+  class12Subject5: Yup.string().required("Subject 5 is required").max(255, "Subject name cannot exceed 255 characters"),
   class12Subject5Marks: Yup.number()
-    .typeError("Marks must be a number")
-    .min(0, "Marks cannot be less than 0")
-    .max(100, "Marks cannot exceed 100"),
-  
+    .typeError("Subject 5 marks must be a number")
+    .required("Subject 5 marks is required")
+    .min(0, "Subject 5 marks cannot be less than 0")
+    .max(100, "Subject 5 marks cannot exceed 100"),
 });
 
 const MultiStepComponent = () => {
