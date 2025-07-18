@@ -9,7 +9,7 @@ function adminMiddleware(req, res, next) {
     const credentials = Buffer.from(base64Credentials, "base64").toString("ascii");
     const [username, password] = credentials.split(":");
   
-    if (username === "admin" && password === "admin123") {
+    if (username === "admin" && password === "{=6I_bq4l')B") {
       next();
     } else {
       res.status(403).json({ message: "Access denied. Admins only." });
