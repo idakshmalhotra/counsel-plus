@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://www.dakshmalhotra.xyz';
+const API_BASE_URL = 'https://dakshmalhotra.xyz';
 
 export const API_ENDPOINTS = {
   // Auth endpoints
