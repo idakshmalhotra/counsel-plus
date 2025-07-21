@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "node -r dotenv/config --experimental-json-modules src/server.js",
     "start": "node src/server.js",
-    "build": "echo 'No build step required for Node.js'"
+    "build": "echo 'No build step required for Node.js'",
+    "create-admin": "node -r dotenv/config src/scripts/createAdmin.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

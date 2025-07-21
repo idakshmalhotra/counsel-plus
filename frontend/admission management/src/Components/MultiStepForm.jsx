@@ -203,8 +203,8 @@ const MultiStepComponent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 py-12 flex items-center justify-center">
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Admission Application</h1>
@@ -240,35 +240,13 @@ const MultiStepComponent = () => {
                     values={formik.values}
                   />
 
-                  {/* Navigation Buttons */}
-                  <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-                    {step > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => setStep((s) => s - 1)}
-                        className="flex items-center space-x-2 px-6 py-3 text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:border-orange-300 hover:text-orange-600 transition-all duration-200 font-medium"
-                      >
-                        <FiArrowLeft className="w-4 h-4" />
-                        <span>Previous</span>
-                      </button>
-                    )}
-                    
-                    <div className="flex-1"></div>
-                    
-                    {step < steps.length - 1 ? (
-                      <button
-                        type="submit"
-                        disabled={!formik.isValid || formik.isSubmitting}
-                        className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                      >
-                        <span>Next Step</span>
-                        <FiArrowRight className="w-4 h-4" />
-                      </button>
-                    ) : (
+                  {/* Show Submit Button on Last Step */}
+                  {step === steps.length - 1 && (
+                    <div className="mt-10 flex justify-end">
                       <button
                         type="submit"
                         disabled={isSubmitting || !formik.isValid}
-                        className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isSubmitting ? (
                           <>
@@ -282,8 +260,8 @@ const MultiStepComponent = () => {
                           </>
                         )}
                       </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </Form>
               )}
             </Formik>

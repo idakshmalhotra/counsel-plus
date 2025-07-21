@@ -148,19 +148,19 @@ const FileUpload = ({
                   {formatFileSize(field.value.size)}
                 </p>
               </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <FiCheck className="w-5 h-5 text-green-500" />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeFile();
-                }}
+              </div>
+              <div className="flex items-center space-x-2">
+                <FiCheck className="w-5 h-5 text-green-500" />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFile();
+                  }}
                 className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
-              >
-                <FiX className="w-4 h-4" />
-              </button>
+                >
+                  <FiX className="w-4 h-4" />
+                </button>
             </div>
           </div>
         ) : (

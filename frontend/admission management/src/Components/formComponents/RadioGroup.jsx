@@ -62,7 +62,7 @@ const RadioGroup = ({ label, options, helpText, ...props }) => {
                   ? "text-red-700"
                   : "text-gray-700 group-hover:text-gray-900"
               }`}>
-                {option.label}
+              {option.label}
               </span>
             </label>
             

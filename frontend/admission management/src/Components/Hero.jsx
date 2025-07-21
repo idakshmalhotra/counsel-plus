@@ -110,10 +110,10 @@ function Hero() {
                 <div key={index} className="text-center group">
                   <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                     <div className="text-orange-600">{stat.icon}</div>
-                  </div>
+              </div>
                   <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
                   <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
-                </div>
+              </div>
               ))}
             </div>
           </div>

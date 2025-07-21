@@ -121,30 +121,30 @@ function Footer() {
                 <FiMail className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <span className="text-sm font-medium text-gray-300">Email</span>
-                  <br />
+                <br />
                   <a href="mailto:support@counsel.com" className="text-gray-400 hover:text-orange-400 transition-colors text-sm">
                     support@counsel.com
-                  </a>
+                </a>
                 </div>
               </li>
               <li className="flex items-start space-x-3">
                 <FiPhone className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <span className="text-sm font-medium text-gray-300">Phone</span>
-                  <br />
+                <br />
                   <a href="tel:+1234567890" className="text-gray-400 hover:text-orange-400 transition-colors text-sm">
-                    +1 (234) 567-8900
-                  </a>
+                  +1 (234) 567-8900
+                </a>
                 </div>
               </li>
               <li className="flex items-start space-x-3">
                 <FiMapPin className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <span className="text-sm font-medium text-gray-300">Address</span>
-                  <br />
+                <br />
                   <span className="text-gray-400 text-sm">
                     123 Education Street<br />
-                    Learning City, LC 12345
+                Learning City, LC 12345
                   </span>
                 </div>
               </li>
@@ -154,20 +154,20 @@ function Footer() {
 
         {/* Bottom Section */}
         <div className="border-t border-gray-800 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
               © {new Date().getFullYear()} Counsel. All rights reserved.
-            </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
+          </p>
+          <div className="flex space-x-6 mt-4 md:mt-0">
               <Link to="/privacy" className="text-gray-400 hover:text-orange-400 transition-colors text-sm">
-                Privacy Policy
-              </Link>
+              Privacy Policy
+            </Link>
               <Link to="/terms" className="text-gray-400 hover:text-orange-400 transition-colors text-sm">
-                Terms of Service
-              </Link>
+              Terms of Service
+            </Link>
               <Link to="/contact" className="text-gray-400 hover:text-orange-400 transition-colors text-sm">
-                Contact Us
-              </Link>
+              Contact Us
+            </Link>
             </div>
           </div>
         </div>

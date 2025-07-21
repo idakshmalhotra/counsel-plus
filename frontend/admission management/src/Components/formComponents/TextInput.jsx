@@ -41,13 +41,13 @@ const TextInput = ({ label, helpText, icon: Icon, ...props }) => {
         
         {/* Success/Error Icons */}
         <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-          {hasError && (
+        {hasError && (
             <FiAlertCircle className="h-5 w-5 text-red-500 animate-pulse" />
           )}
           {isValid && (
             <FiCheckCircle className="h-5 w-5 text-green-500" />
           )}
-        </div>
+          </div>
       </div>
       
       {/* Help Text */}

@@ -1,3 +1,8 @@
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
 function adminMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
   
@@ -9,7 +14,7 @@ function adminMiddleware(req, res, next) {
     const credentials = Buffer.from(base64Credentials, "base64").toString("ascii");
     const [username, password] = credentials.split(":");
   
-    if (username === "admin" && password === "{=6I_bq4l')B") {
+    if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
       next();
     } else {
       res.status(403).json({ message: "Access denied. Admins only." });

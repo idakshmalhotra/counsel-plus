@@ -1,6 +1,9 @@
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,42 +32,19 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter for different file types
-const fileFilter = (req, file, cb) => {
-  // Define allowed file types based on field
-  let allowedTypes;
-  
-  if (file.fieldname === 'photo' || file.fieldname === 'signature' || file.fieldname === 'documents.photographs') {
-    // Images only
-    allowedTypes = /jpeg|jpg|png|gif/;
-  } else {
-    // Documents (including images)
-    allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx/;
-  }
-  
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
-
-  if (mimetype && extname) {
-    return cb(null, true);
-  } else {
-    if (file.fieldname === 'photo' || file.fieldname === 'signature' || file.fieldname === 'documents.photographs') {
-      cb(new Error('Only image files (JPEG, JPG, PNG, GIF) are allowed for photos and signatures'));
-    } else {
-      cb(new Error('Only images and documents (JPEG, JPG, PNG, GIF, PDF, DOC, DOCX) are allowed'));
-    }
-  }
-};
-
 // Create multer instance for handling all uploads
 export const uploadAll = multer({
   storage: storage,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit (matching your error handler)
-    files: 20 // Maximum number of files (you have about 19 fields)
+    fileSize: parseInt(process.env.MAX_FILE_SIZE) || 10485760, // 10MB default
+    files: parseInt(process.env.MAX_FILES_COUNT) || 20 // Default max files
   },
-  fileFilter: fileFilter
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only images and PDF files are allowed'), false);
+    }
+  }
 });
-
-// Export default for backward compatibility
-export default uploadAll;

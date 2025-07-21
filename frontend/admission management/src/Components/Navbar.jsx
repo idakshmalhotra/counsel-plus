@@ -61,19 +61,19 @@ function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-2 lg:space-x-6 xl:space-x-8">
             {navItems.map((item) => (
-              <Link
+                <Link
                 key={item.path}
                 to={item.path}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-base font-medium transition-all duration-200 ${
                   location.pathname === item.path
                     ? "text-orange-600 bg-orange-50 border border-orange-200"
                     : "text-gray-600 hover:text-orange-600 hover:bg-orange-50"
-                }`}
+                  }`}
                 style={{ minWidth: 110, justifyContent: 'center' }}
-              >
+                >
                 {item.icon}
                 <span>{item.label}</span>
-              </Link>
+                </Link>
             ))}
           </div>
 
@@ -145,7 +145,7 @@ function Navbar() {
           <div className="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-md animate-slide-in-from-top duration-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navItems.map((item) => (
-                <Link
+                  <Link
                   key={item.path}
                   to={item.path}
                   className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
@@ -153,10 +153,10 @@ function Navbar() {
                       ? "text-orange-600 bg-orange-50 border border-orange-200"
                       : "text-gray-600 hover:text-orange-600 hover:bg-orange-50"
                   }`}
-                >
+                  >
                   {item.icon}
                   <span>{item.label}</span>
-                </Link>
+                  </Link>
               ))}
             </div>
             <div className="pt-2 border-t border-gray-200">

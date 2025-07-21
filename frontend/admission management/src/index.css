@@ -488,11 +488,11 @@ textarea.error {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .step-line {
     display: none;
   }
-  
+
   .form-container {
     margin: 0.5rem;
     padding: 1.5rem;

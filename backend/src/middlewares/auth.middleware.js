@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
 
-const JWT_SECRET = "1234567890"; // ✅ Same as in your main server
+// Load environment variables
+dotenv.config();
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -12,7 +14,7 @@ const authMiddleware = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // Attach user info to request
     next(); // Proceed to route handler
   } catch (err) {

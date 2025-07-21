@@ -10,32 +10,49 @@ const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filtered, setFiltered] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const fetchData = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
 
+      // Check if user is admin
+      if (role !== "admin") {
+        throw new Error("Unauthorized access");
+      }
+
+      // Validate token
       const validate = await axios.get(API_ENDPOINTS.VALIDATE_TOKEN, {
         headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
       });
 
       if (!validate.data.valid) throw new Error("Token invalid");
 
-      const basicAuth = btoa("admin:admin123");
+      // Use the correct admin credentials
+      const basicAuth = btoa("ZTGXTFWD:{=6I_bq4l')B");
 
       const res = await axios.get(API_ENDPOINTS.ALL_SUBMISSIONS, {
         headers: {
           Authorization: `Basic ${basicAuth}`,
         },
+        withCredentials: true // Add this for CORS with credentials
       });
 
       setStudents(res.data);
       setFiltered(res.data);
     } catch (err) {
       console.error("Auth or data fetch failed:", err);
-      navigate("/signin");
+      setError(err.response?.data?.message || "Failed to fetch data");
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        navigate("/signin");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,6 +76,33 @@ const AdminDashboard = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Submissions");
     XLSX.writeFile(workbook, "student-submissions.xlsx");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading submissions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center text-red-600">
+          <p>{error}</p>
+          <button 
+            onClick={fetchData}
+            className="mt-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 px-6 py-10">

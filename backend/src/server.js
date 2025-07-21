@@ -13,25 +13,23 @@ import authMiddleware from "./middlewares/auth.middleware.js";
 import adminMiddleware from "./middlewares/adminMiddleware.js";
 
 const app = express();
-const PORT = 3000;
-const JWT_SECRET = process.env.JWT_SECRET || "1234567890";
+const PORT = process.env.PORT || 3000;
 
 // ✅ File Upload
-app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
+app.use(fileUpload({ 
+  useTempFiles: true, 
+  tempFileDir: "/tmp/",
+  limits: { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 10485760 } // 10MB default
+}));
 
-// ✅ CORS Configuration - Allow all origins for development
-const allowedOrigins = [
-  'https://plus.d29w8hj3me53fe.amplifyapp.com',
-  'https://plus.d3ounre046g9mh.amplifyapp.com',
-  'https://counsel.d1hhfzrszv4vvo.amplifyapp.com',
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'https://www.dakshmalhotra.xyz'
+// ✅ CORS Configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [
+  'http://localhost:5173'
 ];
 
 app.use(
   cors({
-    origin: true, // Allow all origins temporarily
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -43,24 +41,19 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // ✅ Connect to MongoDB
-async function startServer() {
-  try {
-    await mongoose.connect(
-      process.env.MONGO_URI ||
-        "mongodb+srv://kbharat84265:SjgpL1UbSskmfFBO@cluster0.tfyruuc.mongodb.net/test04"
-    );
-    console.log("✅ MongoDB connected");
-    app.listen(PORT, () => console.log(`🚀 Server at http://localhost:${PORT}`));
-  } catch (error) {
-    console.error("❌ MongoDB connection error:", error);
-  }
+try {
+  await mongoose.connect(process.env.MONGO_URI);
+  console.log("✅ MongoDB connected");
+  app.listen(PORT, () => console.log(`🚀 Server at http://localhost:${PORT}`));
+} catch (error) {
+  console.error("❌ MongoDB connection error:", error);
+  process.exit(1);
 }
-startServer();
 
 // ✅ Cloudinary
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "djhohxhtj",
-  api_key: process.env.CLOUDINARY_API_KEY || "932662126337887",
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
@@ -85,7 +78,7 @@ app.get("/health", (req, res) => {
 // ✅ Signup
 app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
-``
+
   try {
     const existingUser = await AuthUser.findOne({ $or: [{ username }, { email }] });
     if (existingUser) return res.status(409).json({ message: "Username or email exists" });
@@ -95,11 +88,11 @@ app.post("/signup", async (req, res) => {
     res.status(201).json({ message: "User created successfully" });
   } catch (err) {
     console.error("Signup error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ message: "Error creating user" });
   }
 });
 
-// ✅ Signin — returns role ("admin" or "user")
+// ✅ Signin
 app.post("/signin", async (req, res) => {
   const { username, password } = req.body;
 
@@ -110,8 +103,12 @@ app.post("/signin", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password || "");
     if (!isMatch) return res.status(400).json({ msg: "Incorrect password" });
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
-    const role = username === "admin" ? "admin" : "user";
+    const token = jwt.sign(
+      { id: user._id }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: process.env.TOKEN_EXPIRY || "1h" }
+    );
+    const role = username === process.env.ADMIN_USERNAME ? "admin" : "user";
 
     res.json({ token, role });
   } catch (e) {
